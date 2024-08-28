@@ -8,7 +8,7 @@
 ### 2. Install the required libraries.
     pip install -r requirements.txt
 
-### 3. Optimise the algos.
+### 3. Construct maps/ obstacles and optimise the algos.
 
 ## Given by Prof
 
