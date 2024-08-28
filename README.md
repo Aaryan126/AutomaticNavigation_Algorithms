@@ -4,8 +4,8 @@
 
 Added on 2024-08-21 for DIP, by Huang Erdong (erdong.huang@ntu.edu.sg)
 
-### These codes were developed an open-source project on GitHub: https://github.com/AtsushiSakai/PythonRobotics
-#### Feel free to explore this interesting GitHub repo which contain many algorithms related to your DIP. 
+These codes were developed an open-source project on GitHub: https://github.com/AtsushiSakai/PythonRobotics
+Feel free to explore this interesting GitHub repo which contain many algorithms related to your DIP. 
 
 ### - a_star.py
     code for A* algorithm (minimally modified from the original version in the abovementioned GitHub repo)
