@@ -3,11 +3,12 @@
 ## How to Use
 
 ### 1. Clone this repo.
-git clone https://github.com/Aaryan126/AutomaticNavigation_Algortithms.git
+    git clone https://github.com/Aaryan126/AutomaticNavigation_Algortithms.git
 
-### 1. Install the required libraries.
+### 2. Install the required libraries.
+    pip install -r requirements.txt
 
-pip install -r requirements.txt
+### 3. Optimise the algos.
 
 ## Given by Prof
 
