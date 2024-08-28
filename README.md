@@ -3,7 +3,7 @@
 ## How to Use
 
 ### 1. Clone this repo.
-    git clone https://github.com/Aaryan126/AutomaticNavigation_Algortithms.git
+    git clone https://github.com/Aaryan126/AutomaticNavigation_Algorithms.git
 
 ### 2. Install the required libraries.
     pip install -r requirements.txt
