@@ -1,4 +1,13 @@
-# AutomaticNavigation_Algortithms
+# AutomaticNavigation_Algorithms
+
+## How to Use
+
+### 1. Clone this repo.
+git clone https://github.com/Aaryan126/AutomaticNavigation_Algortithms.git
+
+### 1. Install the required libraries.
+
+pip install -r requirements.txt
 
 ## Given by Prof
 
