@@ -1,0 +1,61 @@
+# Edit code from after
+# def main():
+#   print(__file__ + " start!!")
+# to before
+# if show_animation:  # pragma: no cover
+
+# start and goal position
+sx = -8.0  # [m]
+sy = 25.0  # [m]
+gx = 58.0  # [m]
+gy = 25.0  # [m]
+grid_size = 2.0  # [m]
+robot_radius = 1.0  # [m]
+
+# Set obstacle positions
+ox, oy = [], []
+# Create boundary obstacles
+for i in range(-10, 60):
+    ox.append(i)
+    oy.append(-10.0)
+for i in range(-10, 60):
+    ox.append(60.0)
+    oy.append(i)
+for i in range(-10, 61):
+    ox.append(i)
+    oy.append(60.0)
+for i in range(-10, 61):
+    ox.append(-10.0)
+    oy.append(i)
+
+# Create internal obstacles
+# Vertical
+for i in range(-10, 3):
+    ox.append(4.0)
+    oy.append(i)
+for i in range(4, 18):
+    ox.append(18.0)
+    oy.append(i)
+for i in range(46, 60):
+    ox.append(18.0)
+    oy.append(i)
+for i in range(4, 46):
+    ox.append(32.0)
+    oy.append(i)
+for i in range(4, 60):
+    ox.append(46.0)
+    oy.append(i)
+# Horizontal
+for i in range(18, 32):
+    oy.append(4.0)
+    ox.append(i)
+for i in range(4, 18):
+    oy.append(18.0)
+    ox.append(i)
+for i in range(-10, 18):
+    oy.append(32.0)
+    ox.append(i)
+for i in range(4, 32):
+    oy.append(46.0)
+    ox.append(i)
+ob = np.array([ox, oy]).transpose()
