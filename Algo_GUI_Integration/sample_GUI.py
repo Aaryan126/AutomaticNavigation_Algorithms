@@ -105,45 +105,47 @@ class RobotGUI(QMainWindow):
             start_y = float(self.start_y_edit.text())
             end_x = float(self.end_x_edit.text())
             end_y = float(self.end_y_edit.text())
-            end_y = float(self.end_y_edit.text())
-            end_y = float(self.end_y_edit.text())
             
-            #If Circle
-            if self.circle_radio.isChecked(): 
-                radius = float(self.radius_edit.text())
-                
-            #If Rectangle  
-            else:
-                length = float(self.length_edit.text())
-                width = float(self.width_edit.text())
+            # result = subprocess.run(
+            #          ['python', 'dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y)],
+            #          capture_output=True, text=True
+            #      )
             
-
+            self.close()
             # Run the external script and capture the output
             #If Circle
             if self.circle_radio.isChecked(): 
+                radius = float(self.radius_edit.text())
                 result = subprocess.run(
-                    ['python', 'a_star.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius)],
+                    ['python', 'dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius)],
                     capture_output=True, text=True
                 )
-            #If Rectangle
-            else: 
+                
+            #If Rectangle  
+            if self.rectangle_radio.isChecked(): 
+                length = float(self.length_edit.text())
+                width = float(self.width_edit.text())
                 result = subprocess.run(
-                    ['python', 'a_star.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width)],
+                    ['python', 'dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width)],
                     capture_output=True, text=True
                 )
-
-
+            
             # Check for errors
             if result.returncode != 0:
                 QMessageBox.warning(self, "Error", f"Script error: {result.stderr.strip()}")
                 return
+            
+            self.close()
+
 
             #Display the result
             #distance = result.stdout.strip()
             #QMessageBox.information(self, "Result", f"Calculated distance: {distance}")
-
+            
         except ValueError:
             QMessageBox.warning(self, "Input Error", "Please enter valid numbers.")
+        
+        
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
