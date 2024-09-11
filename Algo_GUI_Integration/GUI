@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QComboBox
 from PyQt5.QtGui import QFont
 import sys
+import math
 
 font_title = QFont('Athelas', 16)
 font_title.setBold(True)
@@ -40,19 +41,19 @@ class Joystick(QWidget):
         y = event.y()
 
         # Calculate the distance from the center of the circle (circle_radius, circle_radius)
-        distance = ((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2) ** 0.5
+        distance = math.sqrt((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2)
 
         # If the distance is within the circle radius, update the joystick position
         if distance <= self.circle_radius - self.joystick_radius:
             self.joystick_position = [x, y]
         else:
             # Restrict movement to the edge of the circle
-            angle = QtCore.qAtan2(y - self.circle_radius, x - self.circle_radius)
+            angle = math.atan2(y - self.circle_radius, x - self.circle_radius)
             self.joystick_position = [
-                self.circle_radius + (self.circle_radius - self.joystick_radius) * QtCore.qCos(angle),
-                self.circle_radius + (self.circle_radius - self.joystick_radius) * QtCore.qSin(angle)
+                self.circle_radius + (self.circle_radius - self.joystick_radius) * math.cos(angle),
+                self.circle_radius + (self.circle_radius - self.joystick_radius) * math.sin(angle)
             ]
-        
+
         self.update()  # Trigger paintEvent to redraw the joystick
 
     def mouseReleaseEvent(self, event):
