@@ -96,13 +96,17 @@ for i in range(40):
     oy.append(60.0 - i)
 ob = np.array([ox, oy]).transpose()
 
+# # Open the file containing code #Start -Aaryan
+# with open('map1.txt', 'r') as file:
+#     code = file.read()  # Read the entire file content
+
+# # Execute the code
+# exec(code) #End -Aaryan
+
 # ----- Set up the start and goal positions -----
 # Set the start and goal positions
 sx, sy = 10.0, 10.0
 gx, gy = 50.0, 50.0
-
-#config.robot_type = dwa.RobotType.circle
-#config.robot_radius = 0.25
 
 # Start -Aaryan
 # ---- Getting starting and goal coordinates from GUI ---- 
@@ -148,8 +152,8 @@ if show_animation:  # pragma: no cover
     for (x, y) in ob:
         circle = plt.Circle((x, y), config.obstacle_radius, color="k") #Aaryan - changed config.robot_radius to config.obstacle_radius
         plt.gca().add_patch(circle)
-    plt.plot(sx, sy, "og")
-    plt.plot(gx, gy, "*b")
+    plt.plot(sx, sy, "og") #Start coord
+    plt.plot(gx, gy, "*b") #Goal coord
     plt.grid(True)
     plt.axis("equal")
 
@@ -160,6 +164,7 @@ a_star_planner = a_star.AStarPlanner(
     max_x=max(*ox, sx+2, gx+2), max_y=max(*oy, sy+2, gy+2)
 )
 rx, ry = a_star_planner.planning(sx, sy, gx, gy)
+
 
 road_map = np.array([rx, ry]).transpose()[::-1]
 # print(road_map)
@@ -207,16 +212,29 @@ ob = np.append(ob, new_ob, axis=0)
 if show_animation:  # pragma: no cover
     # plt.plot(new_ob[:,0], new_ob[:,1], ".k")
     for (x, y) in new_ob:
-        circle = plt.Circle((x, y), config.robot_radius, color="k")
+        circle = plt.Circle((x, y), config.obstacle_radius, color="k") #Changed robot_radius to obstacle_radius
         plt.gca().add_patch(circle)
 
 
 # ----- Run DWA path planning -----
-x = np.array([sx, sy, math.pi / 8.0, 0.0, 0.0])
+x = np.array([sx, sy, math.pi / 8.0, 4.0, 0.0])#
 # config = Config()
 
 print(__file__ + " start!!")
 trajectory = np.array(x)
+
+def plot_dist_to_goal(ax, x, dist_to_goal): # Gives the distance from the robot to the goal
+    """ Plot the distance to the goal on the given axes. """
+    # Remove previous distance annotations if they exist
+    for annotation in ax.texts:
+        annotation.remove()
+
+    # Plot new distance annotation
+    ax.text(
+        x[0], x[1], f"Dist: {dist_to_goal:.2f}m",
+        color='red', fontsize=12,
+        verticalalignment='bottom', horizontalalignment='right'
+    )
 
 if show_animation:  # pragma: no cover
     # for stopping simulation with the esc key.
@@ -240,7 +258,7 @@ for i_goal, dwagoal in enumerate(road_map):
             plt_elements = []
             plt_elements.append(plt.plot(predicted_trajectory[:, 0], predicted_trajectory[:, 1], "-g")[0])
             plt_elements.append(plt.plot(x[0], x[1], "xr")[0])
-            plt_elements.extend(dwa.plot_robot(x[0], x[1], x[2], config))
+            plt_elements.extend(dwa.plot_robot(x[0], x[1], x[2], config)) #x[0] is x coord, x[1] is y coord
             plt_elements.extend(dwa.plot_arrow(x[0], x[1], x[2]))
             plt_elements.append(plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")[0])
             plt.pause(0.001)
@@ -252,6 +270,7 @@ for i_goal, dwagoal in enumerate(road_map):
 
         # check reaching goal
         dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1])
+        plot_dist_to_goal(plt.gca(), x, dist_to_goal) # -Aaryan
         if i_goal == len(road_map) - 1:
             if dist_to_goal <= config.catch_goal_dist:
                 print("Goal!!")
