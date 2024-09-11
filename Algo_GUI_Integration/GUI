@@ -68,6 +68,7 @@ class MainWindow(QMainWindow):
 
         # Set up the main window properties
         self.setWindowTitle("Navigation System")
+        
         self.setGeometry(400, 200, 1200, 700)
 
         self.original_width = 1200
@@ -125,16 +126,16 @@ class MainWindow(QMainWindow):
 
         # Velocity control
         self.label_control = QtWidgets.QLabel(self.central_widget)
-        self.label_control.setText("Control:")
+        self.label_control.setText("Set Location:")
         self.label_control.setFont(font_title)
         self.label_control.adjustSize()
         self.label_control.move(980, 200)
 
-        self.btn_accelerate = QtWidgets.QPushButton("Accelerate", self.central_widget)
+        self.btn_accelerate = QtWidgets.QPushButton("Start Point", self.central_widget)
         self.btn_accelerate.setFont(font_button)
         self.btn_accelerate.move(980, 240)
 
-        self.btn_decelerate = QtWidgets.QPushButton("Decelerate", self.central_widget)
+        self.btn_decelerate = QtWidgets.QPushButton("End Point", self.central_widget)
         self.btn_decelerate.setFont(font_button)
         self.btn_decelerate.move(980, 280)
 
