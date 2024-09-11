@@ -1,4 +1,4 @@
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QComboBox
 from PyQt5.QtGui import QFont
 import sys
@@ -15,16 +15,17 @@ class Joystick(QWidget):
 
         # Set joystick properties
         self.joystick_radius = 25
-        self.joystick_position = [100, 100]  # Starting position of the joystick
-        self.setFixedSize(200, 200)  # Size of the joystick area
+        self.joystick_position = [100, 100]  # Starting position of the joystick (center of the widget)
+        self.circle_radius = 100  # Radius of the circular joystick area
+        self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)  # Size of the joystick area (diameter)
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
         painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
-        # Draw background (joystick area)
+        # Draw circular background (joystick area)
         painter.setBrush(QtGui.QBrush(QtGui.QColor(220, 220, 220)))
-        painter.drawRect(self.rect())
+        painter.drawEllipse(0, 0, self.circle_radius * 2, self.circle_radius * 2)
 
         # Draw the joystick (movable circle)
         painter.setBrush(QtGui.QBrush(QtGui.QColor(50, 50, 250)))
@@ -34,24 +35,29 @@ class Joystick(QWidget):
                             self.joystick_radius * 2)
 
     def mouseMoveEvent(self, event):
-        # Handle joystick movement within boundaries
+        # Get the current mouse position relative to the widget
         x = event.x()
         y = event.y()
 
-        # Define joystick boundaries (stay within widget area)
-        max_x = self.width() - self.joystick_radius
-        max_y = self.height() - self.joystick_radius
-        min_x = self.joystick_radius
-        min_y = self.joystick_radius
+        # Calculate the distance from the center of the circle (circle_radius, circle_radius)
+        distance = ((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2) ** 0.5
 
-        # Keep the joystick within the boundaries
-        if min_x <= x <= max_x and min_y <= y <= max_y:
+        # If the distance is within the circle radius, update the joystick position
+        if distance <= self.circle_radius - self.joystick_radius:
             self.joystick_position = [x, y]
-            self.update()  # Trigger paintEvent to redraw the joystick
+        else:
+            # Restrict movement to the edge of the circle
+            angle = QtCore.qAtan2(y - self.circle_radius, x - self.circle_radius)
+            self.joystick_position = [
+                self.circle_radius + (self.circle_radius - self.joystick_radius) * QtCore.qCos(angle),
+                self.circle_radius + (self.circle_radius - self.joystick_radius) * QtCore.qSin(angle)
+            ]
+        
+        self.update()  # Trigger paintEvent to redraw the joystick
 
     def mouseReleaseEvent(self, event):
         # Return the joystick to the center when the mouse is released
-        self.joystick_position = [self.width() // 2, self.height() // 2]
+        self.joystick_position = [self.circle_radius, self.circle_radius]
         self.update()
 
 
