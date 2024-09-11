@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QComboBox
 from PyQt5.QtGui import QFont
 import sys
 import math
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QComboBox, QLabel
 
 font_title = QFont('Athelas', 16)
 font_title.setBold(True)
@@ -28,12 +29,12 @@ class Joystick(QWidget):
         painter.setBrush(QtGui.QBrush(QtGui.QColor(220, 220, 220)))
         painter.drawEllipse(0, 0, self.circle_radius * 2, self.circle_radius * 2)
 
-        # Draw the joystick (movable circle) with integer values
+        # Draw the joystick (movable circle)
         painter.setBrush(QtGui.QBrush(QtGui.QColor(50, 50, 250)))
         painter.drawEllipse(int(self.joystick_position[0] - self.joystick_radius),
                             int(self.joystick_position[1] - self.joystick_radius),
-                            int(self.joystick_radius * 2),
-                            int(self.joystick_radius * 2))
+                            self.joystick_radius * 2,
+                            self.joystick_radius * 2)
 
     def mouseMoveEvent(self, event):
         # Get the current mouse position relative to the widget
@@ -41,7 +42,7 @@ class Joystick(QWidget):
         y = event.y()
 
         # Calculate the distance from the center of the circle (circle_radius, circle_radius)
-        distance = math.sqrt((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2)
+        distance = ((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2) ** 0.5
 
         # If the distance is within the circle radius, update the joystick position
         if distance <= self.circle_radius - self.joystick_radius:
@@ -53,7 +54,7 @@ class Joystick(QWidget):
                 self.circle_radius + (self.circle_radius - self.joystick_radius) * math.cos(angle),
                 self.circle_radius + (self.circle_radius - self.joystick_radius) * math.sin(angle)
             ]
-
+        
         self.update()  # Trigger paintEvent to redraw the joystick
 
     def mouseReleaseEvent(self, event):
@@ -63,6 +64,7 @@ class Joystick(QWidget):
 
 
 class MainWindow(QMainWindow):
+
     def __init__(self):
         super().__init__()
 
@@ -71,43 +73,45 @@ class MainWindow(QMainWindow):
         
         self.setGeometry(400, 200, 1200, 700)
 
-        self.original_width = 1200
-        self.original_height = 700
-
+        # No central widget layout is used here. We use absolute positioning.
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
-        # Command Label
+    #Command Label
         self.label_command = QtWidgets.QLabel(self.central_widget)
         self.label_command.setText("Command:")
         self.label_command.setFont(font_title)
         self.label_command.adjustSize()
         self.label_command.move(700, 30)
 
-        # Command buttons
+    #Command buttons
         self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
         self.btn_start.setFont(font_button)
-        self.btn_start.move(700, 70)
+        self.btn_start.move(700, 70) 
+        #Function for start
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
-        self.btn_pause.move(820, 70)
+        self.btn_pause.move(820, 70) 
+        #Function for pause
 
         self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
         self.btn_manual.setFont(font_button)
-        self.btn_manual.move(700, 110)
+        self.btn_manual.move(700, 110) 
+        #Function for manual
 
         self.btn_automatic = QtWidgets.QPushButton("Automatic", self.central_widget)
         self.btn_automatic.setFont(font_button)
-        self.btn_automatic.move(820, 110)
+        self.btn_automatic.move(820, 110) 
+        #Function for automatic
 
-        # Joystick
+    #Joystick
         self.joystick = Joystick(self.central_widget)
-        self.joystick.move(700, 160)
+        self.joystick.move(700, 160)  # Move joystick to desired position
 
-        # Map selection
+    #Choose map
         self.map_select = QComboBox(self)
-        self.map_select.setGeometry(1000, 70, 150, 30)
+        self.map_select.setGeometry(1000, 70, 150, 30)  
 
         self.map_select.addItem("Map 1")
         self.map_select.addItem("Map 2")
@@ -116,15 +120,15 @@ class MainWindow(QMainWindow):
         self.map_select.addItem("Map 5")
         self.map_select.addItem("Customize")
 
-        # Ship size selection
+    #Ship size
         self.ship_select = QComboBox(self)
-        self.ship_select.setGeometry(1000, 120, 150, 30)
+        self.ship_select.setGeometry(1000, 120, 150, 30)  
 
         self.ship_select.addItem("Small Ship")
         self.ship_select.addItem("Medium Ship")
         self.ship_select.addItem("Large Ship")
 
-        # Velocity control
+    #Velocity control
         self.label_control = QtWidgets.QLabel(self.central_widget)
         self.label_control.setText("Set Location:")
         self.label_control.setFont(font_title)
@@ -133,13 +137,15 @@ class MainWindow(QMainWindow):
 
         self.btn_accelerate = QtWidgets.QPushButton("Start Point", self.central_widget)
         self.btn_accelerate.setFont(font_button)
-        self.btn_accelerate.move(980, 240)
+        self.btn_accelerate.move(980, 240) 
+        #Function for accelerate
 
         self.btn_decelerate = QtWidgets.QPushButton("End Point", self.central_widget)
         self.btn_decelerate.setFont(font_button)
-        self.btn_decelerate.move(980, 280)
+        self.btn_decelerate.move(980, 280) 
+        #Function for decelerate
 
-        # Map
+    #Map
         self.label_map = QtWidgets.QLabel(self.central_widget)
         self.label_map.setText("Map:")
         self.label_map.setFont(font_title)
@@ -150,55 +156,70 @@ class MainWindow(QMainWindow):
         self.map.setStyleSheet("background-color: white; border: 1px solid black;")
         self.map.setGeometry(50, 80, 600, 570)
 
-        # Dashboard
+    #Dashboard
         self.btn_dashboard = QtWidgets.QPushButton("Dashboard", self.central_widget)
         self.btn_dashboard.setFont(font_button)
-        self.btn_dashboard.move(700, 400)
+        self.btn_dashboard.move(700, 400) 
+        #Function for dashboard
 
         self.btn_notification = QtWidgets.QPushButton("Notification", self.central_widget)
         self.btn_notification.setFont(font_button)
-        self.btn_notification.move(800, 400)
+        self.btn_notification.move(800, 400) 
+
+        #Function for notification
 
         self.btn_sensor_data = QtWidgets.QPushButton("Sensor data", self.central_widget)
         self.btn_sensor_data.setFont(font_button)
-        self.btn_sensor_data.move(930, 400)
+        self.btn_sensor_data.move(930, 400) 
+       
+        #Function for sensor data
 
-        self.win_dashboard = QWidget(self.central_widget)
-        self.win_dashboard.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.win_dashboard.setGeometry(700, 430, 450, 220)
 
-    def resizeEvent(self, event):
-        new_width = self.width()
-        new_height = self.height()
+     # Create unique windows for each button
+        self.dashboard_window = QWidget(self)
+        self.dashboard_window.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.dashboard_window.setGeometry(700, 430, 450, 220)
+        self.dashboard_label = QLabel("Dashboard", self.dashboard_window)
+        self.dashboard_label.move(10, 10)
 
-        # Calculate scale factors
-        scale_x = new_width / self.original_width
-        scale_y = new_height / self.original_height
+        self.notification_window = QWidget(self)
+        self.notification_window.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.notification_window.setGeometry(700, 430, 450, 220)
+        self.notification_label = QLabel("Notifications", self.notification_window)
+        self.notification_label.move(10, 10)
 
-        # Scale and move widgets proportionally
-        self.label_command.move(int(700 * scale_x), int(30 * scale_y))
-        self.btn_start.move(int(700 * scale_x), int(70 * scale_y))
-        self.btn_pause.move(int(820 * scale_x), int(70 * scale_y))
-        self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
-        self.btn_automatic.move(int(820 * scale_x), int(110 * scale_y))
-        self.joystick.move(int(700 * scale_x), int(160 * scale_y))
+        self.sensor_data_window = QWidget(self)
+        self.sensor_data_window.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.sensor_data_window.setGeometry(700, 430, 450, 220)
+        self.sensor_data_label = QLabel("Sensor Data", self.sensor_data_window)
+        self.sensor_data_label.move(10, 10)
 
-        self.map_select.setGeometry(int(1000 * scale_x), int(70 * scale_y), int(150 * scale_x), int(30 * scale_y))
-        self.ship_select.setGeometry(int(1000 * scale_x), int(120 * scale_y), int(150 * scale_x), int(30 * scale_y))
+        # Initially hide all the windows
+        self.notification_window.hide()
+        self.sensor_data_window.hide()
 
-        self.label_control.move(int(980 * scale_x), int(200 * scale_y))
-        self.btn_accelerate.move(int(980 * scale_x), int(240 * scale_y))
-        self.btn_decelerate.move(int(980 * scale_x), int(280 * scale_y))
+        # Connect button clicks to show the corresponding window
+        self.btn_dashboard.clicked.connect(lambda: self.show_window(self.dashboard_window))
+        self.btn_notification.clicked.connect(lambda: self.show_window(self.notification_window))
+        self.btn_sensor_data.clicked.connect(lambda: self.show_window(self.sensor_data_window))
 
-        self.label_map.move(int(50 * scale_x), int(30 * scale_y))
-        self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(570 * scale_y))
+    def show_window(self, window):
+        # Hide the current dashboard window
+        if window == self.dashboard_window:
+            self.notification_window.hide()
+            self.sensor_data_window.hide()
+        elif window == self.notification_window:
+            self.dashboard_window.hide()
+            self.sensor_data_window.hide()
+        elif window == self.sensor_data_window:
+            self.dashboard_window.hide()
+            self.notification_window.hide()
 
-        self.btn_dashboard.move(int(700 * scale_x), int(400 * scale_y))
-        self.btn_notification.move(int(800 * scale_x), int(400 * scale_y))
-        self.btn_sensor_data.move(int(930 * scale_x), int(400 * scale_y))
-        self.win_dashboard.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
+        # Show the selected window
+        window.show()
 
-        super().resizeEvent(event)
+
+
 
 
 def window():
