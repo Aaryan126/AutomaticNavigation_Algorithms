@@ -28,12 +28,12 @@ class Joystick(QWidget):
         painter.setBrush(QtGui.QBrush(QtGui.QColor(220, 220, 220)))
         painter.drawEllipse(0, 0, self.circle_radius * 2, self.circle_radius * 2)
 
-        # Draw the joystick (movable circle)
+        # Draw the joystick (movable circle) with integer values
         painter.setBrush(QtGui.QBrush(QtGui.QColor(50, 50, 250)))
-        painter.drawEllipse(self.joystick_position[0] - self.joystick_radius,
-                            self.joystick_position[1] - self.joystick_radius,
-                            self.joystick_radius * 2,
-                            self.joystick_radius * 2)
+        painter.drawEllipse(int(self.joystick_position[0] - self.joystick_radius),
+                            int(self.joystick_position[1] - self.joystick_radius),
+                            int(self.joystick_radius * 2),
+                            int(self.joystick_radius * 2))
 
     def mouseMoveEvent(self, event):
         # Get the current mouse position relative to the widget
