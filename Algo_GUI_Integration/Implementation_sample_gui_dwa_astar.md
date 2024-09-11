@@ -1,0 +1,13 @@
+##Acceptable ranges for features:
+
+###Coordinates
+0 < x < 60, 0 < y < 60
+Coordinates must be multiples of 5
+
+###Robottype == Rectangle: 
+0 < Width < 1
+0 < Length < 1
+
+###Robottype == Circle: 
+0 < Circle < 1
+            
