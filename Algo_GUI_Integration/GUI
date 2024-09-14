@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton
 from PyQt5.QtGui import QFont
 import sys
 import math
@@ -62,6 +62,31 @@ class Joystick(QWidget):
         self.update()
 
 
+class CustomizeWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+
+        # Set properties for the embedded window
+        self.setAutoFillBackground(True)
+        palette = self.palette()
+        palette.setColor(self.backgroundRole(), QtGui.QColor('white'))
+        self.setPalette(palette)
+        
+        # Set widget size and position to cover the dropdown lists
+        self.setGeometry(700, 30, 450, 350)
+
+        # Add a label
+        self.label_customersetting = QLabel("Customize Settings:", self)
+        self.label_customersetting.setFont(font_title)
+        self.label_customersetting.adjustSize()
+        self.label_customersetting.move(20, 30)
+
+        # Add a close button
+        self.close_button = QPushButton("Close", self)
+        self.close_button.setFont(font_button)
+        self.close_button.setGeometry(175, 300, 100, 40)
+        self.close_button.clicked.connect(self.hide)  # Hide the widget when close button is clicked
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -114,6 +139,7 @@ class MainWindow(QMainWindow):
         self.map_select.addItem("Map 4")
         self.map_select.addItem("Map 5")
         self.map_select.addItem("Customize")
+        self.map_select.currentIndexChanged.connect(self.map_changed)
 
         # Ship size selection
         self.ship_select = QComboBox(self)
@@ -125,7 +151,7 @@ class MainWindow(QMainWindow):
 
         # Velocity control
         self.label_control = QLabel(self.central_widget)
-        self.label_control.setText("Set Location:")
+        self.label_control.setText("Locate:")
         self.label_control.setFont(font_title)
         self.label_control.adjustSize()
         self.label_control.move(980, 200)
@@ -190,6 +216,10 @@ class MainWindow(QMainWindow):
         self.btn_notification.clicked.connect(lambda: self.show_window(self.notification_window))
         self.btn_sensor_data.clicked.connect(lambda: self.show_window(self.sensor_data_window))
 
+        # Customize widget (hidden by default)
+        self.customize_widget = CustomizeWidget(self.central_widget)
+        self.customize_widget.hide()  # Initially hidden
+
     def show_window(self, window):
         # Hide all other windows
         self.dashboard_window.hide()
@@ -198,6 +228,14 @@ class MainWindow(QMainWindow):
 
         # Show the selected window
         window.show()
+
+    def map_changed(self):
+        if self.map_select.currentText() == "Customize":
+            self.show_customize_widget()
+
+    def show_customize_widget(self):
+        self.customize_widget.show()
+        self.customize_widget.raise_()
 
     def resizeEvent(self, event):
         new_width = self.width()
