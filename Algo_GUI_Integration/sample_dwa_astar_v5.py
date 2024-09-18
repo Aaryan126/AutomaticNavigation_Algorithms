@@ -60,6 +60,7 @@ class Config:
         # if robot_type == RobotType.rectangle
         self.robot_width = 0.5  # [m] for collision check
         self.robot_length = 1.2  # [m] for collision check
+        self.robot_dim = self.robot_length # [m] for collision check # -Aaryan
 
     @property
     def robot_type(self):
@@ -133,6 +134,7 @@ try:
     elif len(sys.argv) == 6: # For circle
         config.robot_type = dwa.RobotType.circle
         config.robot_radius = float(sys.argv[5])
+        config.robot_dim = config.robot_radius
     
 except ValueError:
     print("Error: All arguments must be numbers.")
@@ -144,7 +146,8 @@ except ValueError:
 if show_animation:  # pragma: no cover
     if save_animation_to_figs:
         cur_dir = os.path.dirname(__file__)
-        fig_dir = os.path.join(cur_dir, 'figs')
+        #fig_dir = os.path.join(cur_dir, 'figs')
+        fig_dir = 'C:\\aarya\\Desktop\\EE3180\\figs'
         os.makedirs(fig_dir, exist_ok=False)
         i_fig = 0
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
@@ -173,6 +176,7 @@ road_map = np.array([rx, ry]).transpose()[::-1]
 if show_animation:  # pragma: no cover
     # plt.plot(rx, ry, "-r")
     plt.plot(rx, ry, "xb")
+    #plt.pause(0.1)
     plt.pause(0.001)
 
     if save_animation_to_figs:
@@ -217,7 +221,7 @@ if show_animation:  # pragma: no cover
 
 
 # ----- Run DWA path planning -----
-x = np.array([sx, sy, math.pi / 8.0, 4.0, 0.0])#
+x = np.array([sx, sy, math.pi / 8.0, 1.0, 0.0])
 # config = Config()
 
 print(__file__ + " start!!")
@@ -230,11 +234,17 @@ def plot_dist_to_goal(ax, x, dist_to_goal): # Gives the distance from the robot 
         annotation.remove()
 
     # Plot new distance annotation
-    ax.text(
-        x[0], x[1], f"Dist: {dist_to_goal:.2f}m",
-        color='red', fontsize=12,
+    ax.text( #Distance from local goal
+        x[0], x[1], f"Dist: {dist_to_goal:.2f}",
+        color='red', fontsize=8,
         verticalalignment='bottom', horizontalalignment='right'
     )
+    ax.text( #Distance from global goal
+    gx, gy, f"Dist: {global_dist_to_goal:.2f}",
+        color='green', fontsize=8,
+        verticalalignment='bottom', horizontalalignment='right'
+    )
+    global_dist_to_goal
 
 if show_animation:  # pragma: no cover
     # for stopping simulation with the esc key.
@@ -261,6 +271,7 @@ for i_goal, dwagoal in enumerate(road_map):
             plt_elements.extend(dwa.plot_robot(x[0], x[1], x[2], config)) #x[0] is x coord, x[1] is y coord
             plt_elements.extend(dwa.plot_arrow(x[0], x[1], x[2]))
             plt_elements.append(plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")[0])
+            #plt.pause(0.1)
             plt.pause(0.001)
 
             if save_animation_to_figs:
@@ -269,7 +280,9 @@ for i_goal, dwagoal in enumerate(road_map):
                 fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
         # check reaching goal
-        dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1])
+        dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1]) # Local Goal
+        global_dist_to_goal = math.hypot(x[0] - gx, x[1] - gy) # Global Goal
+        
         plot_dist_to_goal(plt.gca(), x, dist_to_goal) # -Aaryan
         if i_goal == len(road_map) - 1:
             if dist_to_goal <= config.catch_goal_dist:
@@ -278,6 +291,7 @@ for i_goal, dwagoal in enumerate(road_map):
         else:
             if dist_to_goal <= config.catch_localgoal_dist:
                 print("Local goal!!")
+                print("Distance to the goal: ", dist_to_goal)
                 break
     
 print("Done")
