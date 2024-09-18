@@ -127,7 +127,10 @@ try:
     gx = float(sys.argv[3])
     gy = float(sys.argv[4])
 
-    if len(sys.argv) == 7: # For rectangle
+    # We can use the number arguments that is being recieved from the GUI to distinguish if the user wants the robot to be a rectangle or a circle
+    # If the user wants rectangle shape - they enter length and width, therefore, total 7 arguments, whereas if the user wants circle shape, they enter only radius, therefore, 6 total arguments
+    
+    if len(sys.argv) == 7: #For rectangle
         config.robot_type = dwa.RobotType.rectangle
         config.robot_length = float(sys.argv[5])
         config.robot_width = float(sys.argv[6])
@@ -137,7 +140,7 @@ try:
         config.robot_dim = config.robot_radius
     
 except ValueError:
-    print("Error: All arguments must be numbers.")
+    print("Error: All arguments must be numbers.") #Making sure that the fields only except numeric values
     sys.exit(1)
     
 #End -Aaryan
@@ -221,7 +224,7 @@ if show_animation:  # pragma: no cover
 
 
 # ----- Run DWA path planning -----
-x = np.array([sx, sy, math.pi / 8.0, 1.0, 0.0])
+x = np.array([sx, sy, math.pi / 8.0, 1.0, 0.0]) #Changed the speed of the robot from 0 to 1, so that it is easier to manipulate the code as the code runs faster
 # config = Config()
 
 print(__file__ + " start!!")
@@ -235,12 +238,12 @@ def plot_dist_to_goal(ax, x, dist_to_goal): # Gives the distance from the robot 
 
     # Plot new distance annotation
     ax.text( #Distance from local goal
-        x[0], x[1], f"Dist: {dist_to_goal:.2f}",
+        x[0], x[1], f"Dist: {dist_to_goal:.2f}", #Plotting the distance from the robot to the local goal, pinning it to the left of the robot
         color='red', fontsize=8,
         verticalalignment='bottom', horizontalalignment='right'
     )
     ax.text( #Distance from global goal
-    gx, gy, f"Dist: {global_dist_to_goal:.2f}",
+    gx, gy, f"Dist: {global_dist_to_goal:.2f}", #Plotting the distance fro the robot to the end goal
         color='green', fontsize=8,
         verticalalignment='bottom', horizontalalignment='right'
     )
@@ -280,8 +283,8 @@ for i_goal, dwagoal in enumerate(road_map):
                 fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
         # check reaching goal
-        dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1]) # Local Goal
-        global_dist_to_goal = math.hypot(x[0] - gx, x[1] - gy) # Global Goal
+        dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1]) # Local Goal - This is the distance from the robot to the local goals, it updates each time the robot reaches the local goal
+        global_dist_to_goal = math.hypot(x[0] - gx, x[1] - gy) # Global Goal - Distance from robot to the end goal
         
         plot_dist_to_goal(plt.gca(), x, dist_to_goal) # -Aaryan
         if i_goal == len(road_map) - 1:
