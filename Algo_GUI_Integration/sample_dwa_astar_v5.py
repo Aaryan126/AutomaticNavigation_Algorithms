@@ -298,4 +298,3 @@ print("Done")
 if show_animation:  # pragma: no cover
     plt.show()
         
-
