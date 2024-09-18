@@ -151,7 +151,7 @@ class MainWindow(QMainWindow):
         self.ship_shape = QComboBox(self)
         self.ship_shape.setGeometry(980, 155, 150, 30)
 
-        self.ship_shape.addItem("Reactangle")
+        self.ship_shape.addItem("Rectangle")
         self.ship_shape.addItem("Circle")
 
         self.label_length = QLabel(self.central_widget)
