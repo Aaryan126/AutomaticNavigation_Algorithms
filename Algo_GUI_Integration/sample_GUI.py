@@ -99,7 +99,7 @@ class RobotGUI(QMainWindow):
 
 
     def calculate(self):
-        try:
+        try: # try and except used in case there is any error
             # Read coordinates from input fields
             start_x = float(self.start_x_edit.text())
             start_y = float(self.start_y_edit.text())
@@ -111,10 +111,10 @@ class RobotGUI(QMainWindow):
             #          capture_output=True, text=True
             #      )
             
-            self.close()
+            self.close() # This is used to close the GUI window once the user fills in the appropriate fields and clicks 'Calculate' such that a new window opens showing the algorithm running.
             # Run the external script and capture the output
             #If Circle
-            if self.circle_radio.isChecked(): 
+            if self.circle_radio.isChecked(): #Used to check if the user wants the robot to be a circle, if so the radius is passed to the subprocess which is the dwa_astar_v5.py
                 radius = float(self.radius_edit.text())
                 result = subprocess.run(
                     ['python', 'dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius)],
@@ -122,7 +122,7 @@ class RobotGUI(QMainWindow):
                 )
                 
             #If Rectangle  
-            if self.rectangle_radio.isChecked(): 
+            if self.rectangle_radio.isChecked(): #Used to check if the user wants the robot to be a rectangle, if so the width and the length are passed to the subprocess which is the dwa_astar_v5.py
                 length = float(self.length_edit.text())
                 width = float(self.width_edit.text())
                 result = subprocess.run(
