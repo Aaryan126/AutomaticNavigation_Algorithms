@@ -137,7 +137,6 @@ class RobotGUI(QMainWindow):
             
             self.close()
 
-
             #Display the result
             #distance = result.stdout.strip()
             #QMessageBox.information(self, "Result", f"Calculated distance: {distance}")
