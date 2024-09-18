@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
 show_animation = True
-save_animation_to_figs = True
+save_animation_to_figs = False
 
 """
 In this version of codes, a lower resolution A* path is used to guide the DWA path.
