@@ -1,0 +1,49 @@
+#This map is for resolution of 5
+#To be added between
+# ----- Set up the map -----
+#ox, oy = [], []
+
+#ob = np.array([ox, oy]).transpose()
+#------------------------------------------------------------------#---------------------
+
+# Border
+for i in range(60):
+    ox.append(i)
+    oy.append(0.0)
+for i in range(60):
+    ox.append(60.0)
+    oy.append(i)
+for i in range(61):
+    ox.append(i)
+    oy.append(60.0)
+for i in range(61):
+    ox.append(0.0)
+    oy.append(i)
+
+# Inner Walls 
+# Vertical
+for i in range(16):
+    ox.append(15.0)
+    oy.append(i)
+for i in range(16):
+    ox.append(30.0)
+    oy.append(30.0+i)
+for i in range(16):
+    ox.append(45.0)
+    oy.append(15.0+i)
+for i in range(16):
+    ox.append(45.0)
+    oy.append(45.0+i)
+# Horizontal
+for i in range(15):
+    ox.append(16.0+i)
+    oy.append(15.0)
+for i in range(15):
+    ox.append(i)
+    oy.append(30.0)
+for i in range(15):
+    ox.append(31.0+i)
+    oy.append(30.0)
+for i in range(15):
+    ox.append(15.0+i)
+    oy.append(45.0)
