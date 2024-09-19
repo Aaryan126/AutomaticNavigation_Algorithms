@@ -353,6 +353,8 @@ class MainWindow(QMainWindow):
             end_x = float(self.end_x_edit.text())
             end_y = float(self.end_y_edit.text())
             
+            selected_map = self.map_select.currentText()
+            
             # result = subprocess.run(
             #          ['python', 'dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y)],
             #          capture_output=True, text=True
@@ -364,14 +366,14 @@ class MainWindow(QMainWindow):
             if self.ship_shape.currentText() == "Circle": 
                 radius = float(self.radius_input.text())
                 result = subprocess.run(
-                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius)],
+                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map],
                     capture_output=True, text=True
                 )
             if self.ship_shape.currentText() == "Rectangle": 
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
                 result = subprocess.run(
-                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width)],
+                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map],
                     capture_output=True, text=True
                 )
             
