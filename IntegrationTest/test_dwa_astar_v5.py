@@ -15,7 +15,8 @@ import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
 
 show_animation = True
-save_animation_to_figs = False
+#save_animation_to_figs = False
+save_animation_to_figs = True
 
 """
 In this version of codes, a lower resolution A* path is used to guide the DWA path.
@@ -76,34 +77,6 @@ class Config:
 
 config = Config()
 
-# ----- Set up the map -----
-ox, oy = [], []
-for i in range(60):
-    ox.append(i)
-    oy.append(0.0)
-for i in range(60):
-    ox.append(60.0)
-    oy.append(i)
-for i in range(61):
-    ox.append(i)
-    oy.append(60.0)
-for i in range(61):
-    ox.append(0.0)
-    oy.append(i)
-for i in range(40):
-    ox.append(20.0)
-    oy.append(i)
-for i in range(40):
-    ox.append(40.0)
-    oy.append(60.0 - i)
-ob = np.array([ox, oy]).transpose()
-
-# # Open the file containing code #Start -Aaryan
-# with open('map1.txt', 'r') as file:
-#     code = file.read()  # Read the entire file content
-
-# # Execute the code
-# exec(code) #End -Aaryan
 
 # ----- Set up the start and goal positions -----
 # Set the start and goal positions
@@ -113,13 +86,9 @@ gx, gy = 50.0, 50.0
 # Start -Aaryan
 # ---- Getting starting and goal coordinates from GUI ---- 
 
-if len(sys.argv) not in [6, 7]:  # 6 arguments for circle, 7 for rectangle
+if len(sys.argv) not in [7, 8]:  # 7 arguments for circle, 8 for rectangle
     print("Usage: python robot_controller.py start_x start_y end_x end_y [length width] OR [radius]")
     sys.exit(1)
-    
-# if len(sys.argv) not in [5]:  # 6 arguments for circle, 7 for rectangle
-#     print("Usage: python robot_controller.py start_x start_y end_x end_y [length width] OR [radius]")
-#     sys.exit(1)
 
 try:
     # Read coordinates from command-line arguments
@@ -128,14 +97,18 @@ try:
     gx = float(sys.argv[3])
     gy = float(sys.argv[4])
 
-    if len(sys.argv) == 7: # For rectangle
+    if len(sys.argv) == 8: # For rectangle
         config.robot_type = dwa.RobotType.rectangle
         config.robot_length = float(sys.argv[5])
         config.robot_width = float(sys.argv[6])
-    elif len(sys.argv) == 6: # For circle
+        selected_map = sys.argv[7]
+    elif len(sys.argv) == 7: # For circle
         config.robot_type = dwa.RobotType.circle
         config.robot_radius = float(sys.argv[5])
         config.robot_dim = config.robot_radius
+        selected_map = sys.argv[6]
+        
+    
     
 except ValueError:
     print("Error: All arguments must be numbers.")
@@ -143,13 +116,67 @@ except ValueError:
     
 #End -Aaryan
 
+# ----- Set up the map -----
+ox, oy = [], []
+# Load obstacles from the selected map file
+maps_dir = os.path.join(os.path.dirname(__file__), "Maps")
+map_file = os.path.join(maps_dir, f"{selected_map.lower().replace(' ', '_')}.txt")  # Convert "Map 1" to "map_1.txt"#
+print(map_file)
+#map_file = f"{selected_map.lower().replace(' ', '_')}.txt"  # Convert "Map 1" to "map_1.txt"
+try:
+    with open(map_file, 'r') as file:
+        map_code = file.read()  # Read the entire file content
+        
+        # Create empty lists to populate ox and oy
+        ox, oy = [], []
+
+        # Execute the map file contents, which appends values to ox and oy
+        exec(map_code)
+        
+        # After executing, convert ox and oy into an obstacle array
+        ob = np.array([ox, oy]).transpose()
+
+except FileNotFoundError:
+    print(f"Error: Map file '{map_file}' not found.")
+    sys.exit(1)
+except Exception as e:
+    print(f"Error: Unable to execute the map file '{map_file}'. Reason: {str(e)}")
+    sys.exit(1)
+# End -Aaryan
+# for i in range(60):
+#     ox.append(i)
+#     oy.append(0.0)
+# for i in range(60):
+#     ox.append(60.0)
+#     oy.append(i)
+# for i in range(61):
+#     ox.append(i)
+#     oy.append(60.0)
+# for i in range(61):
+#     ox.append(0.0)
+#     oy.append(i)
+# for i in range(40):
+#     ox.append(20.0)
+#     oy.append(i)
+# for i in range(40):
+#     ox.append(40.0)
+#     oy.append(60.0 - i)
+#ob = np.array([ox, oy]).transpose()
+
+# # Open the file containing code #Start -Aaryan
+# with open('map1.txt', 'r') as file:
+#     code = file.read()  # Read the entire file content
+
+# # Execute the code
+# exec(code) #End -Aaryan
+
 # Plot the map
 if show_animation:  # pragma: no cover
     if save_animation_to_figs:
         cur_dir = os.path.dirname(__file__)
         fig_dir = os.path.join(cur_dir, 'figs')
-        #fig_dir = 'C:\\aarya\\Desktop\\EE3180\\figs\\'
-        os.makedirs(fig_dir, exist_ok=False)
+        #os.makedirs(fig_dir, exist_ok=False)
+        os.makedirs(fig_dir, exist_ok=True)
         i_fig = 0
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
     # plt.plot(ox, oy, ".k")
