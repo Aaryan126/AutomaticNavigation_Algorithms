@@ -330,15 +330,15 @@ class MainWindow(QMainWindow):
         selected_map = self.map_select.currentText()
 
         if selected_map == "Map 1":
-            self.map.load_background_image("Images/1.png")
+            self.map.load_background_image("Images/Map_1.png")
         elif selected_map == "Map 2":
-            self.map.load_background_image("Images/2.png")
+            self.map.load_background_image("Images/Map_2.png")
         elif selected_map == "Map 3":
-            self.map.load_background_image("Images/3.png")
+            self.map.load_background_image("Images/Map_3.png")
         elif selected_map == "Map 4":
-            self.map.load_background_image("Images/4.png")
+            self.map.load_background_image("Images/Map_4.png")
         elif selected_map == "Map 5":
-            self.map.load_background_image("Images/5.png")
+            self.map.load_background_image("Images/Map_5.png")
         elif selected_map == "Customize":
             self.show_customize_widget()
 
