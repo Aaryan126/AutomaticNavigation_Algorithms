@@ -1,6 +1,6 @@
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup
-from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor
 import sys
 import math
 import subprocess
@@ -10,6 +10,47 @@ font_title.setBold(True)
 
 font_button = QFont('Athelas', 12)
 
+class Map(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.setGeometry(50, 80, 600, 570)
+        self.dots = []  # List to store dots (positions of clicked points)
+        self.background_image = None
+
+    def load_background_image(self, image_path):
+        self.background_image = QPixmap(image_path)
+        self.update()
+
+    def mousePressEvent(self, event):
+        if self.background_image:  # Allow dots only if a map is selected
+            x = event.x()
+            y = event.y()
+            self.dots.append((x, y))
+            self.update()
+
+    def paintEvent(self, event):
+        super().paintEvent(event)
+        painter = QPainter(self)
+
+        # Draw the background image if loaded
+        if self.background_image:
+            painter.drawPixmap(0, 0, self.width(), self.height(), self.background_image)
+        else:
+            # If no map is selected, display a placeholder
+            painter.setBrush(QBrush(QColor(240, 240, 240)))  
+            painter.drawRect(0, 0, self.width(), self.height())
+
+            painter.setPen(QColor(150, 150, 150))  
+            painter.setFont(QFont("Arial", 16))
+            painter.drawText(self.rect(), QtCore.Qt.AlignCenter, "Please select a map")
+
+        # Draw all the black dots only if a background is loaded
+        if self.background_image:
+            painter.setBrush(QBrush(QColor(0, 0, 0))) 
+            for dot in self.dots:
+                x, y = dot
+                painter.drawEllipse(x - 5, y - 5, 10, 10)
 
 class Joystick(QWidget):
     def __init__(self, parent=None):
@@ -147,6 +188,13 @@ class MainWindow(QMainWindow):
         self.joystick = Joystick(self.central_widget)
         self.joystick.move(700, 160)
 
+        #Map label
+        self.label_map = QLabel(self.central_widget)
+        self.label_map.setText("Map:")
+        self.label_map.setFont(font_title)
+        self.label_map.adjustSize()
+        self.label_map.move(50, 30)
+
         # Map selection
         self.map_select = QComboBox(self)
         self.map_select.setGeometry(1000, 70, 150, 30)
@@ -215,15 +263,7 @@ class MainWindow(QMainWindow):
         self.btn_endpoint.move(980, 360)
 
         # Map
-        self.label_map = QLabel(self.central_widget)
-        self.label_map.setText("Map:")
-        self.label_map.setFont(font_title)
-        self.label_map.adjustSize()
-        self.label_map.move(50, 30)
-
-        self.map = QWidget(self.central_widget)
-        self.map.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.map.setGeometry(50, 80, 600, 570)
+        self.map = Map(self.central_widget)
 
         # Buttons for additional windows
         self.btn_dashboard = QtWidgets.QPushButton("Dashboard", self.central_widget)
@@ -266,18 +306,18 @@ class MainWindow(QMainWindow):
         self.btn_notification.clicked.connect(lambda: self.show_window(self.notification_window))
         self.btn_sensor_data.clicked.connect(lambda: self.show_window(self.sensor_data_window))
         
-         # QLabel to display the map image (initialize it here)
-        self.label_map_image = QLabel(self.central_widget)
-        self.label_map_image.setGeometry(50, 80, 600, 570)
-        self.label_map_image.setStyleSheet("border: 1px solid black;")
-        self.label_map_image.setScaledContents(True)  # To make the image scale properly
+        # QLabel to display the map image (initialize it here)
+        self.map_image = QLabel(self.central_widget)
+        self.map_image.setGeometry(50, 80, 600, 570)
+        self.map_image.setStyleSheet("border: 1px solid black;")
+        self.map_image.setScaledContents(True)  # To make the image scale properly
+        self.map_image.hide() #Testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # Customize widget (hidden by default)
         self.customize_widget = CustomizeWidget(self.central_widget)
         self.customize_widget.hide()  # Initially hidden
 
     def show_window(self, window):
-        # Hide all other windows
         self.dashboard_window.hide()
         self.notification_window.hide()
         self.sensor_data_window.hide()
@@ -285,39 +325,34 @@ class MainWindow(QMainWindow):
         # Show the selected window
         window.show()
 
-    #def map_changed(self):
-    #    if self.map_select.currentText() == "Customize":
-    #        self.show_customize_widget()
-            
-    # Add this method inside the MainWindow class
-    
-    def map_changed(self): #Aaryan
+
+    def map_changed(self):
         selected_map = self.map_select.currentText()
 
         if selected_map == "Map 1":
-            self.display_map_image("Images/1.png")
+            self.map.load_background_image("Images/1.png")
         elif selected_map == "Map 2":
-            self.display_map_image("Images/2.png")
+            self.map.load_background_image("Images/2.png")
         elif selected_map == "Map 3":
-            self.display_map_image("Images/3.png")
+            self.map.load_background_image("Images/3.png")
         elif selected_map == "Map 4":
-            self.display_map_image("Images/4.png")
+            self.map.load_background_image("Images/4.png")
         elif selected_map == "Map 5":
-            self.display_map_image("Images/5.png")
+            self.map.load_background_image("Images/5.png")
         elif selected_map == "Customize":
             self.show_customize_widget()
 
     # Add this method to display the image in the QLabel for the map
     def display_map_image(self, image_path): # Aaryan
          # Clear the existing pixmap before setting a new one
-        self.label_map_image.clear()
+        self.map_image.clear()
         
         # Load the new image and set it as the pixmap
         pixmap = QPixmap(image_path)
-        self.label_map_image.setPixmap(pixmap)
+        self.map_image.setPixmap(pixmap)
 
         # Force the label to update its display
-        self.label_map_image.repaint()
+        self.map_image.repaint()
 
     def toggle_input_fields(self):
         if self.ship_shape.currentText() == "Circle":
@@ -349,6 +384,7 @@ class MainWindow(QMainWindow):
 
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
+        self.label_map.move(int(50 * scale_x), int(30 * scale_y))
         self.btn_start.move(int(700 * scale_x), int(70 * scale_y))
         self.btn_pause.move(int(820 * scale_x), int(70 * scale_y))
         self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
@@ -357,7 +393,6 @@ class MainWindow(QMainWindow):
         self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
         self.btn_startpoint.move(int(980 * scale_x), int(330 * scale_y))
         self.btn_endpoint.move(int(980 * scale_x), int(360 * scale_y))
-        self.label_map.move(int(50 * scale_x), int(30 * scale_y))
         self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(570 * scale_y))
 
         self.btn_dashboard.move(int(700 * scale_x), int(400 * scale_y))
@@ -403,14 +438,14 @@ class MainWindow(QMainWindow):
             if self.ship_shape.currentText() == "Circle": 
                 radius = float(self.radius_input.text())
                 result = subprocess.run(
-                    ['python3', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map],
+                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map],
                     capture_output=True, text=True
                 )
             if self.ship_shape.currentText() == "Rectangle": 
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
                 result = subprocess.run(
-                    ['python3', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map],
+                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map],
                     capture_output=True, text=True
                 )
             
