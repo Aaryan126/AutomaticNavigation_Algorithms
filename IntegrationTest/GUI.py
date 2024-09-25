@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import QFont, QPixmap
 import sys
 import math
 import subprocess
@@ -151,6 +151,7 @@ class MainWindow(QMainWindow):
         self.map_select = QComboBox(self)
         self.map_select.setGeometry(1000, 70, 150, 30)
 
+        self.map_select.addItem("Select")
         self.map_select.addItem("Map 1")
         self.map_select.addItem("Map 2")
         self.map_select.addItem("Map 3")
@@ -264,6 +265,12 @@ class MainWindow(QMainWindow):
         self.btn_dashboard.clicked.connect(lambda: self.show_window(self.dashboard_window))
         self.btn_notification.clicked.connect(lambda: self.show_window(self.notification_window))
         self.btn_sensor_data.clicked.connect(lambda: self.show_window(self.sensor_data_window))
+        
+         # QLabel to display the map image (initialize it here)
+        self.label_map_image = QLabel(self.central_widget)
+        self.label_map_image.setGeometry(50, 80, 600, 570)
+        self.label_map_image.setStyleSheet("border: 1px solid black;")
+        self.label_map_image.setScaledContents(True)  # To make the image scale properly
 
         # Customize widget (hidden by default)
         self.customize_widget = CustomizeWidget(self.central_widget)
@@ -278,9 +285,39 @@ class MainWindow(QMainWindow):
         # Show the selected window
         window.show()
 
-    def map_changed(self):
-        if self.map_select.currentText() == "Customize":
+    #def map_changed(self):
+    #    if self.map_select.currentText() == "Customize":
+    #        self.show_customize_widget()
+            
+    # Add this method inside the MainWindow class
+    
+    def map_changed(self): #Aaryan
+        selected_map = self.map_select.currentText()
+
+        if selected_map == "Map 1":
+            self.display_map_image("Images/1.png")
+        elif selected_map == "Map 2":
+            self.display_map_image("Images/2.png")
+        elif selected_map == "Map 3":
+            self.display_map_image("Images/3.png")
+        elif selected_map == "Map 4":
+            self.display_map_image("Images/4.png")
+        elif selected_map == "Map 5":
+            self.display_map_image("Images/5.png")
+        elif selected_map == "Customize":
             self.show_customize_widget()
+
+    # Add this method to display the image in the QLabel for the map
+    def display_map_image(self, image_path): # Aaryan
+         # Clear the existing pixmap before setting a new one
+        self.label_map_image.clear()
+        
+        # Load the new image and set it as the pixmap
+        pixmap = QPixmap(image_path)
+        self.label_map_image.setPixmap(pixmap)
+
+        # Force the label to update its display
+        self.label_map_image.repaint()
 
     def toggle_input_fields(self):
         if self.ship_shape.currentText() == "Circle":
