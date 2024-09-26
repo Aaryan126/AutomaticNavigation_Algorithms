@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup
 from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor
+from PyQt5.QtCore import QThread, pyqtSignal
 import sys
 import math
 import subprocess
@@ -10,12 +11,37 @@ font_title.setBold(True)
 
 font_button = QFont('Athelas', 12)
 
+class BackendWorker(QThread):
+    result_ready = pyqtSignal(str)
+
+    def __init__(self, abs_x, abs_y):
+        super().__init__()
+        self.abs_x = abs_x
+        self.abs_y = abs_y
+
+    def run(self):
+        try:
+            # Run the backend algorithm as a subprocess
+            result = subprocess.run(
+                ['python', 'dwa_astar_v5_user_input_obs.py', str(self.abs_x), str(self.abs_y)],
+                capture_output=True, text=True
+            )
+
+            # Emit the result once the process completes
+            if result.returncode == 0:
+                self.result_ready.emit(result.stdout)
+            else:
+                self.result_ready.emit(f"Error: {result.stderr}")
+
+        except Exception as e:
+            self.result_ready.emit(f"Exception: {str(e)}")
+
 class Map(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.setStyleSheet("background-color: white; border: 2px solid black; padding: 1px;")
         self.setGeometry(50, 80, 600, 570)
-        self.dots = []  # List to store dots (positions of clicked points)
+        self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.background_image = None
 
     def load_background_image(self, image_path):
@@ -23,11 +49,45 @@ class Map(QWidget):
         self.update()
 
     def mousePressEvent(self, event):
-        if self.background_image:  # Allow dots only if a map is selected
-            x = event.x()
-            y = event.y()
-            self.dots.append((x, y))
-            self.update()
+        # Get the current size of the map
+        map_width = self.width()
+        map_height = self.height()
+
+        # Calculate the relative position as a percentage of the map size
+        relative_x = event.x() / map_width
+        relative_y = event.y() / map_height
+
+        # Store the relative position
+        self.dots.append((relative_x, relative_y))
+
+        # Send coordinates to backend algorithm
+        self.send_coordinates_to_backend(relative_x, relative_y)
+
+        # Trigger a repaint of the widget
+        self.update()
+
+    def send_coordinates_to_backend(self, relative_x, relative_y):
+    #Send the clicked coordinates to the backend algorithm using QThread to avoid blocking the GUI.
+        try:
+            # Convert relative coordinates to absolute positions based on the map size
+            map_width = self.width()
+            map_height = self.height()
+            abs_x = int(relative_x * map_width)
+            abs_y = int(relative_y * map_height)
+
+            print(f"Sending coordinates to backend: {abs_x}, {abs_y}")
+
+            # Run the backend in a separate thread to avoid blocking the GUI
+            self.worker_thread = BackendWorker(abs_x, abs_y)
+            self.worker_thread.result_ready.connect(self.on_backend_result)
+            self.worker_thread.start()
+
+        except Exception as e:
+            print(f"Error sending coordinates to backend: {e}")
+
+    def on_backend_result(self, result):
+        """Handle the result from the backend worker."""
+        print(result)
 
     def paintEvent(self, event):
         super().paintEvent(event)
@@ -38,19 +98,22 @@ class Map(QWidget):
             painter.drawPixmap(0, 0, self.width(), self.height(), self.background_image)
         else:
             # If no map is selected, display a placeholder
-            painter.setBrush(QBrush(QColor(240, 240, 240)))  
+            painter.setBrush(QBrush(QColor(240, 240, 240)))  # Light gray background
             painter.drawRect(0, 0, self.width(), self.height())
-
-            painter.setPen(QColor(150, 150, 150))  
+            painter.setPen(QColor(150, 150, 150))  # Gray color for the text
             painter.setFont(QFont("Arial", 16))
             painter.drawText(self.rect(), QtCore.Qt.AlignCenter, "Please select a map")
 
-        # Draw all the black dots only if a background is loaded
-        if self.background_image:
-            painter.setBrush(QBrush(QColor(0, 0, 0))) 
-            for dot in self.dots:
-                x, y = dot
-                painter.drawEllipse(x - 5, y - 5, 10, 10)
+        # Recalculate the dots' positions based on the current size of the map
+        map_width = self.width()
+        map_height = self.height()
+
+        painter.setBrush(QBrush(QColor(0, 0, 0)))  # Black color for the dots
+        for relative_x, relative_y in self.dots:
+            # Convert relative positions back to absolute positions based on the current size
+            x = int(relative_x * map_width)
+            y = int(relative_y * map_height)
+            painter.drawEllipse(x - 5, y - 5, 10, 10)
 
 class Joystick(QWidget):
     def __init__(self, parent=None):
