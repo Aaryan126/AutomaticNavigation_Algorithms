@@ -549,7 +549,12 @@ class MainWindow(QMainWindow):
                 command = ['test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map]
             
             # Start the subprocess without blocking the GUI
-            self.process.start('python', command)                
+            #self.process.start('python', command)   
+            
+            if os.name == 'nt':  # If the OS is Windows
+                startupinfo = subprocess.STARTUPINFO()
+                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)             
             
             # figs_folder = 'figs'  # Change this to your actual path
             # self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
@@ -587,7 +592,7 @@ class MainWindow(QMainWindow):
             
     def start(self):
         """Start the timer to periodically update the background image."""
-        self.timer.start(3000)
+        self.timer.start(5000)
 
     def pause(self):
         """Pause the image updates."""
