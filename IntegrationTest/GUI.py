@@ -1,10 +1,11 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup
 from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor
-from PyQt5.QtCore import QThread, pyqtSignal
+from PyQt5.QtCore import QThread, pyqtSignal, QProcess, QTimer
 import sys
 import math
 import subprocess
+import os
 
 font_title = QFont('Athelas', 16)
 font_title.setBold(True)
@@ -234,10 +235,12 @@ class MainWindow(QMainWindow):
         self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
         self.btn_start.setFont(font_button)
         self.btn_start.move(700, 70)
+        self.btn_start.clicked.connect(self.start)
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
         self.btn_pause.move(820, 70)
+        self.btn_pause.clicked.connect(self.pause)
 
         self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
         self.btn_manual.setFont(font_button)
@@ -379,6 +382,15 @@ class MainWindow(QMainWindow):
         # Customize widget (hidden by default)
         self.customize_widget = CustomizeWidget(self.central_widget)
         self.customize_widget.hide()  # Initially hidden
+        
+        # Create a QProcess object
+        self.process = QProcess(self)
+        self.process.finished.connect(self.on_process_finished)
+        
+        self.image_list = []  # List to hold all the image paths
+        self.image_index = 0  # To keep track of the current image index
+        self.timer = QTimer(self)  # Timer for updating the images
+        self.timer.timeout.connect(self.update_image)  # Call update_image every timeout
 
     def show_window(self, window):
         self.dashboard_window.hide()
@@ -404,6 +416,11 @@ class MainWindow(QMainWindow):
             self.map.load_background_image("Images/Map_5.png")
         elif selected_map == "Customize":
             self.show_customize_widget()
+        elif selected_map == "Select": 
+            self.map_image.clear()
+            self.map.background_image = None
+            self.update()
+            
 
     # Add this method to display the image in the QLabel for the map
     def display_map_image(self, image_path): # Aaryan
@@ -480,14 +497,18 @@ class MainWindow(QMainWindow):
             window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
 
 
-    def set(self):
+    def set(self): #Anything changed in this GUI script after we press "set" will not be changed because of the subprocess (matplotlib) running takes over all of the computing power
         try:
+        
+            #self.map_image.clear()
+            #self.map.background_image = None
+            #self.update()
+            
             # Read coordinates from input fields
             start_x = float(self.start_x_edit.text())
             start_y = float(self.start_y_edit.text())
             end_x = float(self.end_x_edit.text())
             end_y = float(self.end_y_edit.text())
-            
             selected_map = self.map_select.currentText()
             
             # result = subprocess.run(
@@ -495,29 +516,56 @@ class MainWindow(QMainWindow):
             #          capture_output=True, text=True
             #      )
             
-            self.close()
-            # Run the external script and capture the output
-            #If Circle
-            if self.ship_shape.currentText() == "Circle": 
+            # #self.close()
+            # # Run the external script and capture the output
+            # #If Circle
+            # if self.ship_shape.currentText() == "Circle": 
+            #     radius = float(self.radius_input.text())
+            #     result = subprocess.run(
+            #         ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map],
+            #         capture_output=True, text=True
+            #     )
+            # if self.ship_shape.currentText() == "Rectangle": 
+            #     length = float(self.length_input.text())
+            #     width = float(self.width_input.text())
+            #     result = subprocess.run(
+            #         ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map],
+            #         capture_output=True, text=True
+            #     )
+            
+            # # Check for errors
+            # if result.returncode != 0:
+            #     QMessageBox.warning(self, "Error", f"Script error: {result.stderr.strip()}")
+            #     return
+            
+            # self.close()
+            
+            if self.ship_shape.currentText() == "Circle":
                 radius = float(self.radius_input.text())
-                result = subprocess.run(
-                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map],
-                    capture_output=True, text=True
-                )
-            if self.ship_shape.currentText() == "Rectangle": 
+                command = ['test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map]
+            elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                result = subprocess.run(
-                    ['python', 'test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map],
-                    capture_output=True, text=True
-                )
+                command = ['test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map]
             
-            # Check for errors
-            if result.returncode != 0:
-                QMessageBox.warning(self, "Error", f"Script error: {result.stderr.strip()}")
-                return
+            # Start the subprocess without blocking the GUI
+            self.process.start('python', command)                
             
-            self.close()
+            # figs_folder = 'figs'  # Change this to your actual path
+            # self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
+
+            # if self.image_list:
+            #     QTimer.singleShot(5000, self.start_image_update)   # Start the timer with a 50 second interval
+            
+            def load_images():
+                figs_folder = 'figs'  # Change this to your actual path
+                self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
+
+                if self.image_list:
+                    QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 5-second interval
+
+            # Start the 10 seconds delay
+            QTimer.singleShot(10000, load_images)
 
             #Display the result
             #distance = result.stdout.strip()
@@ -525,8 +573,37 @@ class MainWindow(QMainWindow):
             
         except ValueError:
             QMessageBox.warning(self, "Input Error", "Please enter valid numbers.")
+            
+    def start_image_update(self):
+        # Start the main timer with a 5 second interval
+        self.timer.start(5000)
+            
+    def update_image(self):
+        # Load and display the next image in the map background
+        if self.image_list:
+            image_path = self.image_list[self.image_index]
+            self.map.load_background_image(image_path)  # Use your map's load_background_image function
+            self.image_index = (self.image_index + 1) % len(self.image_list)  # Loop back to the start
+            
+    def start(self):
+        """Start the timer to periodically update the background image."""
+        self.timer.start(3000)
+
+    def pause(self):
+        """Pause the image updates."""
+        self.timer.stop()
 
     
+    def on_process_finished(self):
+            # Handle the completion of the process
+            result = self.process.readAllStandardOutput().data().decode()
+            error = self.process.readAllStandardError().data().decode()
+
+            if self.process.exitCode() != 0:
+                QMessageBox.warning(self, "Error", f"Script error: {error}")
+            else:
+                QMessageBox.information(self, "Success", result)
+            
 def main():
     app = QApplication(sys.argv)
     main_window = MainWindow()
