@@ -1,4 +1,12 @@
-import os, sys
+import os, sys, shutil
+
+#Removing 'figs'
+figs_dir = os.path.join(os.path.dirname(__file__), 'figs')
+
+# Check if the 'figs' directory exists and remove it
+if os.path.exists(figs_dir) and os.path.isdir(figs_dir):
+    shutil.rmtree(figs_dir)  # Remove the directory and all its contents
+
 rpath = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..")
 )
