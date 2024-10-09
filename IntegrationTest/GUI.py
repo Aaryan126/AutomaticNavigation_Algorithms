@@ -6,6 +6,7 @@ import sys
 import math
 import subprocess
 import os
+import time
 
 font_title = QFont('Athelas', 16)
 font_title.setBold(True)
@@ -496,14 +497,15 @@ class MainWindow(QMainWindow):
         for window in [self.dashboard_window, self.notification_window, self.sensor_data_window]:
             window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
 
+    def load_images(self):
+        figs_folder = 'figs'  # Change this to your actual path
+        self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
 
+        if self.image_list:
+            QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval
+                    
     def set(self): #Anything changed in this GUI script after we press "set" will not be changed because of the subprocess (matplotlib) running takes over all of the computing power
         try:
-        
-            #self.map_image.clear()
-            #self.map.background_image = None
-            #self.update()
-            
             # Read coordinates from input fields
             start_x = float(self.start_x_edit.text())
             start_y = float(self.start_y_edit.text())
@@ -548,51 +550,57 @@ class MainWindow(QMainWindow):
                 width = float(self.width_input.text())
                 command = ['test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map]
             
-            # Start the subprocess without blocking the GUI
-            #self.process.start('python', command)   
+            # Start subprocess
+            # self.process.start('python', command)   
             
-            if os.name == 'nt':  # If the OS is Windows
+            #Start subprocess in background without showing it
+            if os.name == 'nt':
                 startupinfo = subprocess.STARTUPINFO()
                 startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
                 self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)             
-            
-            # figs_folder = 'figs'  # Change this to your actual path
-            # self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
 
-            # if self.image_list:
-            #     QTimer.singleShot(5000, self.start_image_update)   # Start the timer with a 50 second interval
-            
-            def load_images():
-                figs_folder = 'figs'  # Change this to your actual path
-                self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
-
-                if self.image_list:
-                    QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 5-second interval
-
-            # Start the 10 seconds delay
-            QTimer.singleShot(10000, load_images)
-
-            #Display the result
-            #distance = result.stdout.strip()
-            #QMessageBox.information(self, "Result", f"Calculated distance: {distance}")
+            # Start the 5 seconds delay
+            QTimer.singleShot(5000, self.load_images)
             
         except ValueError:
             QMessageBox.warning(self, "Input Error", "Please enter valid numbers.")
             
     def start_image_update(self):
-        # Start the main timer with a 5 second interval
-        self.timer.start(5000)
+        # Start the main timer with a 0.5 second interval
+        self.timer.start(500)
             
+    # def update_image(self):
+    #     # Load and display the next image in the map background
+    #     if self.image_list:
+    #         image_path = self.image_list[self.image_index]
+    #         self.map.load_background_image(image_path)  # Use your map's load_background_image function
+    #         self.image_index = (self.image_index + 1) % len(self.image_list)  # Loop back to the start
+    
     def update_image(self):
-        # Load and display the next image in the map background
+    # Check if we have a valid image list
         if self.image_list:
-            image_path = self.image_list[self.image_index]
-            self.map.load_background_image(image_path)  # Use your map's load_background_image function
-            self.image_index = (self.image_index + 1) % len(self.image_list)  # Loop back to the start
+            # If the index is within the bounds of the image list, load the next image
+            if self.image_index < len(self.image_list):
+                image_path = self.image_list[self.image_index]
+                self.map.load_background_image(image_path)  # Use your map's load_background_image function
+                print("Loading: ", image_path)
+                self.image_index += 1  # Move to the next image
+            else:
+                # We've reached the end of the current list, try reloading
+                self.load_images()
+                if self.image_index < len(self.image_list):  # If there are new images, continue from where we left off
+                    self.update_image()
+                else:
+                    # If still no new images, stop updating
+                    self.timer.stop()
+        else:
+            # No images in the list initially, stop the timer
+            self.timer.stop()
             
     def start(self):
         """Start the timer to periodically update the background image."""
-        self.timer.start(5000)
+        self.timer.start(1000)
+        self.image_index = 0  # Initialize the index
 
     def pause(self):
         """Pause the image updates."""
