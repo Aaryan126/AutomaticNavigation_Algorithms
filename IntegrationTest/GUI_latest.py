@@ -83,7 +83,7 @@ class Map(QWidget):
             # Run the backend in a separate thread to avoid blocking the GUI
             self.worker_thread = BackendWorker(abs_x, abs_y)
             self.worker_thread.result_ready.connect(self.on_backend_result)
-            self.worker_thread.start()
+            self.worker_thread.resume()
 
         except Exception as e:
             print(f"Error sending coordinates to backend: {e}")
@@ -229,13 +229,13 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         # Code used for testing only !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        self.start_label = QLabel(self.central_widget)
-        self.start_label.setText("Start-:")
-        self.start_label.move(200, 30)
-        self.start_x_edit = QLineEdit(self.central_widget)
-        self.start_x_edit.setGeometry(250, 30, 50, 25)
-        self.start_y_edit = QLineEdit(self.central_widget)
-        self.start_y_edit.setGeometry(300, 30, 50, 25)
+        self.resume_label = QLabel(self.central_widget)
+        self.resume_label.setText("Resume-:")
+        self.resume_label.move(200, 30)
+        self.resume_x_edit = QLineEdit(self.central_widget)
+        self.resume_x_edit.setGeometry(250, 30, 50, 25)
+        self.resume_y_edit = QLineEdit(self.central_widget)
+        self.resume_y_edit.setGeometry(300, 30, 50, 25)
 
         self.end_label = QLabel(self.central_widget)
         self.end_label.setText("End-:")
@@ -253,10 +253,10 @@ class MainWindow(QMainWindow):
         self.label_command.move(700, 30)
 
         # Command buttons
-        self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
-        self.btn_start.setFont(font_button)
-        self.btn_start.move(700, 70)
-        self.btn_start.clicked.connect(self.start)
+        self.btn_resume = QtWidgets.QPushButton("Resume", self.central_widget)
+        self.btn_resume.setFont(font_button)
+        self.btn_resume.move(700, 70)
+        self.btn_resume.clicked.connect(self.resume)
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
@@ -267,9 +267,9 @@ class MainWindow(QMainWindow):
         self.btn_manual.setFont(font_button)
         self.btn_manual.move(700, 110)
 
-        self.btn_automatic = QtWidgets.QPushButton("Automatic", self.central_widget)
-        self.btn_automatic.setFont(font_button)
-        self.btn_automatic.move(820, 110)
+        self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
+        self.btn_start.setFont(font_button)
+        self.btn_start.move(820, 110)
 
         # Joystick
         self.joystick = Joystick(self.central_widget)
@@ -490,10 +490,10 @@ class MainWindow(QMainWindow):
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
         self.label_map.move(int(50 * scale_x), int(30 * scale_y))
-        self.btn_start.move(int(700 * scale_x), int(70 * scale_y))
+        self.btn_resume.move(int(700 * scale_x), int(70 * scale_y))
         self.btn_pause.move(int(820 * scale_x), int(70 * scale_y))
         self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
-        self.btn_automatic.move(int(820 * scale_x), int(110 * scale_y))
+        self.btn_start.move(int(820 * scale_x), int(110 * scale_y))
         self.joystick.move(int(700 * scale_x), int(160 * scale_y))
         self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
         self.btn_startpoint.move(int(980 * scale_x), int(330 * scale_y))
@@ -550,8 +550,8 @@ class MainWindow(QMainWindow):
     def set(self): #Anything changed in this GUI script after we press "set" will not be changed because of the subprocess (matplotlib) running takes over all of the computing power
         try:
             # Read coordinates from input fields
-            start_x = float(self.start_x_edit.text())
-            start_y = float(self.start_y_edit.text())
+            resume_x = float(self.resume_x_edit.text())
+            resume_y = float(self.resume_y_edit.text())
             end_x = float(self.end_x_edit.text())
             end_y = float(self.end_y_edit.text())
             selected_map = self.map_select.currentText()
@@ -587,11 +587,11 @@ class MainWindow(QMainWindow):
             
             if self.ship_shape.currentText() == "Circle":
                 radius = float(self.radius_input.text())
-                command = ['test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(radius), selected_map]
+                command = ['test_dwa_astar_v5.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(radius), selected_map]
             elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                command = ['test_dwa_astar_v5.py', str(start_x), str(start_y), str(end_x), str(end_y), str(length), str(width), selected_map]
+                command = ['test_dwa_astar_v5.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(length), str(width), selected_map]
             
             # Start subprocess
             # self.process.start('python', command)   
@@ -709,11 +709,11 @@ class MainWindow(QMainWindow):
     
     def toggle_pause(self):
         if self.paused:
-            self.start()  # If paused, resume
+            self.resume()  # If paused, resume
         else:
             self.pause()  # If playing, pause
         
-    def start(self):
+    def resume(self):
         if self.paused:
             self.paused = False  # Resume if paused
             print("Resuming")
