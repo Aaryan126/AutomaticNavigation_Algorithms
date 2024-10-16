@@ -214,6 +214,8 @@ if show_animation:  # pragma: no cover
     plt.plot(rx, ry, "xb")
     #plt.pause(0.1)
     plt.pause(0.001)
+    
+    plt.grid(False)
 
     if save_animation_to_figs:
         plt.savefig(fig_path)
@@ -309,6 +311,8 @@ for i_goal, dwagoal in enumerate(road_map):
             plt_elements.append(plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")[0])
             #plt.pause(0.1)
             plt.pause(0.001)
+            
+            plt.grid(False)
 
             if save_animation_to_figs:
                 plt.savefig(fig_path)
