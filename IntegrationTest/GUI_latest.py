@@ -709,11 +709,11 @@ class MainWindow(QMainWindow):
             # No images in the list initially, stop the timer
             self.timer.stop()
     
-    def toggle_pause(self):
-        if self.paused:
-            self.resume()  # If paused, resume
-        else:
-            self.pause()  # If playing, pause
+    #def toggle_pause(self):
+    #    if self.paused:
+    #        self.resume()  # If paused, resume
+    #    else:
+    #        self.pause()  # If playing, pause
         
     def resume(self):
         if self.paused:
