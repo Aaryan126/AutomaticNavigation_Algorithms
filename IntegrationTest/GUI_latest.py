@@ -547,6 +547,17 @@ class MainWindow(QMainWindow):
 
         if self.image_list:
             QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval              
+            
+    def run_subprocess(self, command):
+        if os.name == 'nt':
+            startupinfo = subprocess.STARTUPINFO()
+            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)
+
+    def closeEvent(self, event):
+        print("Trying to close")
+        self.process.kill()
+        
     def set(self): #Anything changed in this GUI script after we press "set" will not be changed because of the subprocess (matplotlib) running takes over all of the computing power
         try:
             # Read coordinates from input fields
@@ -597,11 +608,12 @@ class MainWindow(QMainWindow):
             # self.process.start('python', command)   
             
             #Start subprocess in background without showing it
-            if os.name == 'nt':
-                startupinfo = subprocess.STARTUPINFO()
-                startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-                self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)             
+            # if os.name == 'nt':
+            #     startupinfo = subprocess.STARTUPINFO()
+            #     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+            #     self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)             
 
+            self.run_subprocess(command)
             # Start the 5 seconds delay
             QTimer.singleShot(5000, self.load_images)
             
@@ -696,16 +708,6 @@ class MainWindow(QMainWindow):
         else:
             # No images in the list initially, stop the timer
             self.timer.stop()
-
-            
-    # def start(self):
-    #     """Start the timer to periodically update the background image."""
-    #     self.timer.start(1000)
-    #     self.image_index = 0  # Initialize the index
-
-    # def pause(self):
-    #     """Pause the image updates."""
-    #     self.timer.stop()
     
     def toggle_pause(self):
         if self.paused:
