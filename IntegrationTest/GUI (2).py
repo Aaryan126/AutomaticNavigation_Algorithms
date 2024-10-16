@@ -1,12 +1,13 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup
-from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor
-from PyQt5.QtCore import QThread, pyqtSignal, QProcess, QTimer
+from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor, QImage
+from PyQt5.QtCore import QThread, pyqtSignal, QProcess, QTimer, QRect
 import sys
 import math
 import subprocess
 import os
 import time
+import re
 
 font_title = QFont('Athelas', 16)
 font_title.setBold(True)
@@ -411,6 +412,8 @@ class MainWindow(QMainWindow):
         self.image_index = 0  # To keep track of the current image index
         self.timer = QTimer(self)  # Timer for updating the images
         self.timer.timeout.connect(self.update_image)  # Call update_image every timeout
+        
+        self.paused = False
 
     def show_window(self, window):
         self.dashboard_window.hide()
@@ -527,13 +530,23 @@ class MainWindow(QMainWindow):
         for window in [self.dashboard_window, self.notification_window, self.sensor_data_window]:
             window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
 
+    # def load_images(self):
+    #     figs_folder = 'figs'  # Change this to your actual path
+    #     self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
+
+    #     if self.image_list:
+    #         QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval
+      
+      
     def load_images(self):
         figs_folder = 'figs'  # Change this to your actual path
-        self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
+        self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) 
+                              if img.startswith('frame_') and img.endswith('.png')],
+                             key=lambda x: int(re.findall(r'\d+', os.path.basename(x))[0]))
+
 
         if self.image_list:
-            QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval
-                    
+            QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval              
     def set(self): #Anything changed in this GUI script after we press "set" will not be changed because of the subprocess (matplotlib) running takes over all of the computing power
         try:
             # Read coordinates from input fields
@@ -606,36 +619,116 @@ class MainWindow(QMainWindow):
     #         self.map.load_background_image(image_path)  # Use your map's load_background_image function
     #         self.image_index = (self.image_index + 1) % len(self.image_list)  # Loop back to the start
     
+    # def update_image(self):
+    # # Check if we have a valid image list
+    #     if self.image_list:
+    #         # If the index is within the bounds of the image list, load the next image
+    #         if self.image_index < len(self.image_list):
+    #             image_path = self.image_list[self.image_index]
+    #             self.map.load_background_image(image_path)  # Use your map's load_background_image function
+    #             print("Loading: ", image_path)
+    #             self.image_index += 1  # Move to the next image
+    #         else:
+    #             # We've reached the end of the current list, try reloading
+    #             self.load_images()
+    #             if self.image_index < len(self.image_list):  # If there are new images, continue from where we left off
+    #                 self.update_image()
+    #             else:
+    #                 # If still no new images, stop updating
+    #                 self.timer.stop()
+    #     else:
+    #         # No images in the list initially, stop the timer
+    #         self.timer.stop()
+    
     def update_image(self):
-    # Check if we have a valid image list
+        # Check if we have a valid image list
         if self.image_list:
             # If the index is within the bounds of the image list, load the next image
             if self.image_index < len(self.image_list):
                 image_path = self.image_list[self.image_index]
-                self.map.load_background_image(image_path)  # Use your map's load_background_image function
                 print("Loading: ", image_path)
+
+                # Load the image as QImage
+                image = QImage(image_path)
+
+                # Define crop amounts
+                crop_top = 70
+                crop_bottom = 65
+                crop_left = 155
+                crop_right = 140
+
+                # Calculate new dimensions after cropping
+                original_width = image.width()
+                original_height = image.height()
+                new_width = original_width - crop_left - crop_right
+                new_height = original_height - crop_top - crop_bottom
+
+                # Create the cropping rectangle
+                crop_rect = QRect(crop_left, crop_top, new_width, new_height)
+                self.timer.start(1000) #Added a 1 second pause because there was occassionaly a scaling error where the image wasn't shown
+
+                # Crop the image
+                cropped_image = image.copy(crop_rect)
+
+                # Resize the cropped image to desired dimensions (optional)
+                desired_width = 600  # Set your desired width after cropping
+                desired_height = 400  # Set your desired height after cropping
+                resized_image = cropped_image.scaled(desired_width, desired_height, QtCore.Qt.KeepAspectRatio)
+
+                # Use the map's load_background_image function with the resized image
+                self.map.load_background_image(QPixmap.fromImage(resized_image))  # Load the resized image
+
                 self.image_index += 1  # Move to the next image
             else:
                 # We've reached the end of the current list, try reloading
+                previous_image_index = self.image_index  # Store the current index
                 self.load_images()
-                if self.image_index < len(self.image_list):  # If there are new images, continue from where we left off
-                    self.update_image()
+                
+
+                if len(self.image_list) > previous_image_index:  
+                    # If new images are found, continue from the last index
+                    self.image_index = previous_image_index
+                    if not self.paused:
+                        self.update_image()  # Call update_image to load the next image
                 else:
-                    # If still no new images, stop updating
+                    # If no new images are found, stop updating
                     self.timer.stop()
         else:
             # No images in the list initially, stop the timer
             self.timer.stop()
+
             
+    # def start(self):
+    #     """Start the timer to periodically update the background image."""
+    #     self.timer.start(1000)
+    #     self.image_index = 0  # Initialize the index
+
+    # def pause(self):
+    #     """Pause the image updates."""
+    #     self.timer.stop()
+    
+    def toggle_pause(self):
+        if self.paused:
+            self.start()  # If paused, resume
+        else:
+            self.pause()  # If playing, pause
+        
     def start(self):
-        """Start the timer to periodically update the background image."""
-        self.timer.start(1000)
-        self.image_index = 0  # Initialize the index
+        if self.paused:
+            self.paused = False  # Resume if paused
+            print("Resuming")
+        
+        #self.image_index = 0  # Initialize the index
+        self.timer.start(500)  # Start the timer with the interval
 
+    
     def pause(self):
-        """Pause the image updates."""
-        self.timer.stop()
-
+        if not self.paused:  # Only pause if not already paused
+            self.paused = True  # Set the paused flag
+            print("Pausing")
+            self.timer.stop()  # Stop the timer to prevent further calls
+        else:
+            print("Already paused")
     
     def on_process_finished(self):
             # Handle the completion of the process
