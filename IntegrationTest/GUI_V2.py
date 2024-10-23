@@ -573,11 +573,11 @@ class MainWindow(QMainWindow):
             
             if self.ship_shape.currentText() == "Circle":
                 radius = float(self.radius_input.text())
-                command = ['test_dwa_astar_v5_2.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(radius), selected_map]
+                command = ['test_dwa_astar_v5.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(radius), selected_map]
             elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                command = ['test_dwa_astar_v5_2.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(length), str(width), selected_map]
+                command = ['test_dwa_astar_v5.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(length), str(width), selected_map]
             
             # Start subprocess
             # self.process.start('python', command)   
