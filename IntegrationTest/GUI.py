@@ -283,6 +283,7 @@ class MainWindow(QMainWindow):
         self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
         self.btn_start.setFont(font_button)
         self.btn_start.move(820, 110)
+        self.btn_start.clicked.connect(self.start)
 
         # Joystick
         self.joystick = Joystick(self.central_widget)
@@ -692,6 +693,12 @@ class MainWindow(QMainWindow):
             self.timer.stop()  # Stop the timer to prevent further calls
         else:
             print("Already paused")
+
+    def start(self):
+        print("Pressed Start")
+        with open('transition.txt', 'a') as file:
+        # Write "resume" followed by a newline character
+            file.write("resume\n")
     
     def on_process_finished(self):
             # Handle the completion of the process
