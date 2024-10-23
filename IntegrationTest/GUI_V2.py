@@ -51,6 +51,12 @@ class Map(QWidget):
         self.background_image = QPixmap(image_path)
         self.update()
 
+    # def clear_file(self, filename='transition.txt'):
+    #     # Open the file in write mode to clear its contents
+    #     with open(filename, 'w') as file:
+    #         file.write('')  # Clear the file by writing an empty string
+    #     print(f"File {filename} cleared.")
+
     def mousePressEvent(self, event):
         # Get the current size of the map
         map_width = self.width()
@@ -64,29 +70,36 @@ class Map(QWidget):
         self.dots.append((relative_x, relative_y))
 
         # Send coordinates to backend algorithm
-        self.send_coordinates_to_backend(relative_x, relative_y)
+        #self.send_coordinates_to_backend(relative_x, relative_y)
+        self.add_coordinates_to_file(relative_x, relative_y)
 
         # Trigger a repaint of the widget
         self.update()
 
-    def send_coordinates_to_backend(self, relative_x, relative_y):
-    #Send the clicked coordinates to the backend algorithm using QThread to avoid blocking the GUI.
-        try:
-            # Convert relative coordinates to absolute positions based on the map size
-            map_width = self.width()
-            map_height = self.height()
-            abs_x = int(relative_x * map_width)
-            abs_y = int(relative_y * map_height)
+    def add_coordinates_to_file(self, relative_x, relative_y, filename='transition.txt'):
+        with open(filename, 'a') as file:
+            # Write the inputs to the file, each on a new line
+            file.write(f"[{relative_x}, {relative_y}]\n")
+        print(f"Data saved to {filename}")
 
-            print(f"Sending coordinates to backend: {abs_x}, {abs_y}")
+    # def send_coordinates_to_backend(self, relative_x, relative_y):
+    # #Send the clicked coordinates to the backend algorithm using QThread to avoid blocking the GUI.
+    #     try:
+    #         # Convert relative coordinates to absolute positions based on the map size
+    #         map_width = self.width()
+    #         map_height = self.height()
+    #         abs_x = int(relative_x * map_width)
+    #         abs_y = int(relative_y * map_height)
 
-            # Run the backend in a separate thread to avoid blocking the GUI
-            self.worker_thread = BackendWorker(abs_x, abs_y)
-            self.worker_thread.result_ready.connect(self.on_backend_result)
-            self.worker_thread.resume()
+    #         print(f"Sending coordinates to backend: {abs_x}, {abs_y}")
 
-        except Exception as e:
-            print(f"Error sending coordinates to backend: {e}")
+    #         # Run the backend in a separate thread to avoid blocking the GUI
+    #         self.worker_thread = BackendWorker(abs_x, abs_y)
+    #         self.worker_thread.result_ready.connect(self.on_backend_result)
+    #         self.worker_thread.resume()
+
+    #     except Exception as e:
+    #         print(f"Error sending coordinates to backend: {e}")
 
     def on_backend_result(self, result):
         """Handle the result from the backend worker."""
