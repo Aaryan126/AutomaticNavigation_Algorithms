@@ -43,7 +43,7 @@ class Map(QWidget):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("background-color: white; border: 2px solid black; padding: 1px;")
-        self.setGeometry(50, 80, 600, 570)
+        self.setGeometry(50, 80, 600, 600)
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.background_image = None
 
@@ -51,7 +51,7 @@ class Map(QWidget):
         self.background_image = QPixmap(image_path)
         self.update()
 
-    # def clear_file(self, filename='local_obstacles.txt'):
+    # def clear_file(self, filename='transition.txt'):
     #     # Open the file in write mode to clear its contents
     #     with open(filename, 'w') as file:
     #         file.write('')  # Clear the file by writing an empty string
@@ -80,7 +80,7 @@ class Map(QWidget):
         # Trigger a repaint of the widget
         self.update()
 
-    def add_coordinates_to_file(self, relative_x, relative_y, filename='local_obstacles.txt'):
+    def add_coordinates_to_file(self, relative_x, relative_y, filename='transition.txt'):
         with open(filename, 'a') as file:
             # Write the inputs to the file, each on a new line
             file.write(f"[{relative_x}, {relative_y}]\n")
@@ -446,9 +446,22 @@ class MainWindow(QMainWindow):
 
     def map_changed(self):
         selected_map = self.map_select.currentText()
-        file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'Images',selected_map.replace(" ", "_")+".png")
 
-        if selected_map == "Customize":
+        if selected_map == "Map 1":
+            self.map.load_background_image("Images/Map_1.png")
+        elif selected_map == "Map 2":
+            self.map.load_background_image("Images/Map_2.png")
+        elif selected_map == "Map 3":
+            self.map.load_background_image("Images/Map_3.png")
+        elif selected_map == "Map 4":
+            self.map.load_background_image("Images/Map_4.png")
+        elif selected_map == "Map 5":
+            self.map.load_background_image("Images/Map_5.png")
+        elif selected_map == "SG":
+            self.map.load_background_image("Images/SG.png") #Why doesn't A*Star search harder, when I put start coordinates as 5, 40, it doesn't see a path
+        elif selected_map == "NY":
+            self.map.load_background_image("Images/NY.png")
+        elif selected_map == "Customize":
             self.show_customize_widget()
             self.map_select.lower()
             self.ship_shape.lower()
@@ -456,8 +469,6 @@ class MainWindow(QMainWindow):
             self.map_image.clear()
             self.map.background_image = None
             self.update()
-        else: #Why doesn't A*Star search harder, when I put start coordinates as 5, 40, it doesn't see a path
-            self.map.load_background_image(file_dir)
             
 
     # Add this method to display the image in the QLabel for the map
@@ -550,7 +561,7 @@ class MainWindow(QMainWindow):
       
       
     def load_images(self):
-        figs_folder = os.path.join(os.path.dirname(os.path.realpath(__file__)),'figs')
+        figs_folder = 'figs'  # Change this to your actual path
         self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) 
                               if img.startswith('frame_') and img.endswith('.png')],
                              key=lambda x: int(re.findall(r'\d+', os.path.basename(x))[0]))
@@ -580,11 +591,11 @@ class MainWindow(QMainWindow):
             
             if self.ship_shape.currentText() == "Circle":
                 radius = float(self.radius_input.text())
-                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5_2.py'), str(resume_x), str(resume_y), str(end_x), str(end_y), str(radius), selected_map]
+                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(resume_x), str(resume_y), str(end_x), str(end_y), str(radius), selected_map]
             elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5_2.py', str(resume_x), str(resume_y), str(end_x), str(end_y), str(length), str(width), selected_map]
+                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(resume_x), str(resume_y), str(end_x), str(end_y), str(length), str(width), selected_map]
             
             # Start subprocess
             # self.process.start('python', command)   
@@ -697,7 +708,7 @@ class MainWindow(QMainWindow):
             self.timer.stop()  # Stop the timer to prevent further calls
         else:
             print("Already paused")
-
+            
     def start(self):
         print("Pressed Start")
         with open('transition.txt', 'a') as file:
