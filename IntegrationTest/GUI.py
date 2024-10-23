@@ -51,7 +51,7 @@ class Map(QWidget):
         self.background_image = QPixmap(image_path)
         self.update()
 
-    # def clear_file(self, filename='transition.txt'):
+    # def clear_file(self, filename='local_obstacles.txt'):
     #     # Open the file in write mode to clear its contents
     #     with open(filename, 'w') as file:
     #         file.write('')  # Clear the file by writing an empty string
@@ -76,7 +76,7 @@ class Map(QWidget):
         # Trigger a repaint of the widget
         self.update()
 
-    def add_coordinates_to_file(self, relative_x, relative_y, filename='transition.txt'):
+    def add_coordinates_to_file(self, relative_x, relative_y, filename='local_obstacles.txt'):
         with open(filename, 'a') as file:
             # Write the inputs to the file, each on a new line
             file.write(f"[{relative_x}, {relative_y}]\n")
