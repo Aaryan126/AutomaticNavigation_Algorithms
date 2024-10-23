@@ -441,22 +441,9 @@ class MainWindow(QMainWindow):
 
     def map_changed(self):
         selected_map = self.map_select.currentText()
+        file_dir = os.path.join(os.path.dirname(os.path.realpath(__file__)),'Images',selected_map.replace(" ", "_")+".png")
 
-        if selected_map == "Map 1":
-            self.map.load_background_image("Images/Map_1.png")
-        elif selected_map == "Map 2":
-            self.map.load_background_image("Images/Map_2.png")
-        elif selected_map == "Map 3":
-            self.map.load_background_image("Images/Map_3.png")
-        elif selected_map == "Map 4":
-            self.map.load_background_image("Images/Map_4.png")
-        elif selected_map == "Map 5":
-            self.map.load_background_image("Images/Map_5.png")
-        elif selected_map == "SG":
-            self.map.load_background_image("Images/SG.png") #Why doesn't A*Star search harder, when I put start coordinates as 5, 40, it doesn't see a path
-        elif selected_map == "NY":
-            self.map.load_background_image("Images/NY.png")
-        elif selected_map == "Customize":
+        if selected_map == "Customize":
             self.show_customize_widget()
             self.map_select.lower()
             self.ship_shape.lower()
@@ -464,6 +451,8 @@ class MainWindow(QMainWindow):
             self.map_image.clear()
             self.map.background_image = None
             self.update()
+        else: #Why doesn't A*Star search harder, when I put start coordinates as 5, 40, it doesn't see a path
+            self.map.load_background_image(file_dir)
             
 
     # Add this method to display the image in the QLabel for the map
