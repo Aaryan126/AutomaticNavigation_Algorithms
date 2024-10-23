@@ -62,16 +62,20 @@ class Map(QWidget):
         map_width = self.width()
         map_height = self.height()
 
-        # Calculate the relative position as a percentage of the map size
+        # # Calculate the relative position as a percentage of the map size
         relative_x = event.x() / map_width
         relative_y = event.y() / map_height
+        
+        dot_relative_x = event.x()/10
+        dot_relative_y = (map_height - event.y())/10
+
 
         # Store the relative position
         self.dots.append((relative_x, relative_y))
 
         # Send coordinates to backend algorithm
         #self.send_coordinates_to_backend(relative_x, relative_y)
-        self.add_coordinates_to_file(relative_x, relative_y)
+        self.add_coordinates_to_file(dot_relative_x, dot_relative_y)
 
         # Trigger a repaint of the widget
         self.update()
