@@ -16,11 +16,17 @@ sys.path.append(rpath)
 #from PathPlanning.DynamicWindowApproach import dwa_paper_with_width as dwa
 import dynamic_window_approach_paper as dwa
 import a_star as a_star
+#import a_star_v2 as a_star
+
+# Removes socket error with PyQt5
+import matplotlib
+matplotlib.use('TkAgg')
 
 import math
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import Button
+import time
 
 show_animation = True
 #save_animation_to_figs = False
@@ -127,9 +133,11 @@ except ValueError:
 # ----- Set up the map -----
 ox, oy = [], []
 # Load obstacles from the selected map file
-maps_dir = os.path.join(os.path.dirname(__file__), "Maps")
-map_file = os.path.join(maps_dir, f"{selected_map.lower().replace(' ', '_')}.txt")  # Convert "Map 1" to "map_1.txt"#
+maps_dir = os.path.join(os.path.dirname(__file__), "Maps_2")
+map_file = os.path.join(maps_dir, f"{selected_map}.txt")  
 print(map_file)
+
+is_ob = 0
 #map_file = f"{selected_map.lower().replace(' ', '_')}.txt"  # Convert "Map 1" to "map_1.txt"
 try:
     with open(map_file, 'r') as file:
@@ -137,12 +145,20 @@ try:
         
         # Create empty lists to populate ox and oy
         ox, oy = [], []
+        #ob = np.array([ox, oy]).transpose()
 
         # Execute the map file contents, which appends values to ox and oy
         exec(map_code)
         
-        # After executing, convert ox and oy into an obstacle array
-        ob = np.array([ox, oy]).transpose()
+        # # After executing, convert ox and oy into an obstacle array
+        if (is_ob == 1):
+            
+            print("Works!")
+        else: 
+            ob = np.array([ox, oy]).transpose()
+            #print("ob", ob)
+            #print("Type of ob", type(ob))
+            #print("Length of ob", len(ob))
 
 except FileNotFoundError:
     print(f"Error: Map file '{map_file}' not found.")
@@ -180,6 +196,7 @@ except Exception as e:
 
 # Plot the map
 if show_animation:  # pragma: no cover
+    plt.figure(figsize=(6, 6))
     if save_animation_to_figs:
         cur_dir = os.path.dirname(__file__)
         fig_dir = os.path.join(cur_dir, 'figs')
@@ -218,45 +235,100 @@ if show_animation:  # pragma: no cover
     plt.grid(False)
 
     if save_animation_to_figs:
-        plt.savefig(fig_path)
+        
+        plt.axis('off')
+        #plt.savefig(fig_path)
+
+        plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1) #We can expriment if higher dpi works with a more powerful PC - need to change for both savefig lines
         i_fig += 1
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
-# ----- Put new obstacles on the A* path -----
-new_ob = np.array([
-    [12.5, 12.5], 
-    [15.0, 17.5], 
-    [15.0, 22.5], 
-    [15.0, 27.5], 
-    [15.0, 32.5], 
-    [15.0, 37.5], 
-    [17.5, 42.5], 
-    [22.5, 42.5], 
-    [27.5, 37.5], 
-    [32.5, 32.5], 
-    [35.0, 27.5], 
-    [35.0, 22.5], 
-    [37.5, 17.5], 
-    [42.5, 17.5], 
-    [45.0, 22.5], 
-    [45.0, 27.5], 
-    [45.0, 32.5], 
-    [45.0, 37.5], 
-    [45.0, 42.5], 
-    [47.5, 47.5]
-])
-new_ob1 = new_ob + np.array([0.5, 0.5])
-new_ob2 = new_ob + np.array([-0.5, -0.5])
-new_ob3 = new_ob + np.array([0.5, -0.5])
-new_ob4 = new_ob + np.array([-0.5, 0.5])
-new_ob = np.concatenate((new_ob1, new_ob2, new_ob3, new_ob4), axis=0)
-ob = np.append(ob, new_ob, axis=0)
-if show_animation:  # pragma: no cover
-    # plt.plot(new_ob[:,0], new_ob[:,1], ".k")
-    for (x, y) in new_ob:
-        circle = plt.Circle((x, y), config.obstacle_radius, color="k") #Changed robot_radius to obstacle_radius
-        plt.gca().add_patch(circle)
+# # ----- Put new obstacles on the A* path -----
+# new_ob = np.array([
+#     [12.5, 12.5], 
+#     [15.0, 17.5], 
+#     [15.0, 22.5], 
+#     [15.0, 27.5], 
+#     [15.0, 32.5], 
+#     [15.0, 37.5], 
+#     [17.5, 42.5], 
+#     [22.5, 42.5], 
+#     [27.5, 37.5], 
+#     [32.5, 32.5], 
+#     [35.0, 27.5], 
+#     [35.0, 22.5], 
+#     [37.5, 17.5], 
+#     [42.5, 17.5], 
+#     [45.0, 22.5], 
+#     [45.0, 27.5], 
+#     [45.0, 32.5], 
+#     [45.0, 37.5], 
+#     [45.0, 42.5], 
+#     [47.5, 47.5]
+# ])
+# new_ob1 = new_ob + np.array([0.5, 0.5])
+# new_ob2 = new_ob + np.array([-0.5, -0.5])
+# new_ob3 = new_ob + np.array([0.5, -0.5])
+# new_ob4 = new_ob + np.array([-0.5, 0.5])
+# new_ob = np.concatenate((new_ob1, new_ob2, new_ob3, new_ob4), axis=0)
+# ob = np.append(ob, new_ob, axis=0)
+# if show_animation:  # pragma: no cover
+#     # plt.plot(new_ob[:,0], new_ob[:,1], ".k")
+#     for (x, y) in new_ob:
+#         circle = plt.Circle((x, y), config.obstacle_radius, color="k") #Changed robot_radius to obstacle_radius
+#         plt.gca().add_patch(circle)
 
+# Start- Wen Ci-----------------------------------------------------------------------------------------------------------------------------------------
+# Read local obstacles from file
+def read_new_obstacles():
+    new_ob_list = []
+    with open('transition.txt', 'r+') as pipe:
+        while True:
+            time.sleep(0.5)
+            data = pipe.readline().strip()
+
+            if data == 'resume':
+                # Clear the file
+                pipe.seek(0)
+                pipe.truncate()
+                break
+
+            if data.startswith('[') and data.endswith(']'):
+                array = eval(data)
+                new_ob_list.append(array)
+                print("Local obstacle received:", data)
+        
+
+
+    if new_ob_list:
+        return np.array(new_ob_list)
+    else:
+        return np.array([])  # Return an empty array if no new obstacles
+
+# Update plot
+def update_plot_with_new_obstacles(new_obstacles):
+    for (x, y) in new_obstacles:
+        circle = plt.Circle((x, y), config.obstacle_radius, color="k")
+        plt.gca().add_patch(circle)
+    
+    plt.draw()
+
+# Continuously read new obstacles from transition.txt
+while True:
+    new_ob = read_new_obstacles()
+    if new_ob.size > 0:
+        # Append new obstacles to the current obstacle array
+        ob = np.vstack((ob, new_ob))  # Combine old and new obstacles
+        update_plot_with_new_obstacles(new_ob)  # Plot the new obstacles
+
+    plt.pause(0.001)  # Allow time for the plot to refresh
+
+    if new_ob.size > 0:
+        break
+
+print('Local obstacles plotted!')
+
+# End- Wen Ci-------------------------------------------------------------------------------------------------------------------------------------------
 
 # ----- Run DWA path planning -----
 x = np.array([sx, sy, math.pi / 8.0, 1.0, 0.0])
@@ -291,9 +363,26 @@ if show_animation:  # pragma: no cover
         lambda event: [exit(0) if event.key == 'escape' else None])
     plt_elements = []
 
+min_obstacle_localgoal_distance = 2.0
+
 for i_goal, dwagoal in enumerate(road_map):
     if i_goal == 0:  # Skip the start point
         continue
+
+# Start- Wen Ci------------------------------------------------------------------------------------------------------------------------------------------
+    # Check if the local goal is too close to any added obstacles  
+    skip_goal = False
+    for (obstacle_x, obstacle_y) in ob:
+        distance_to_obstacle = math.hypot(dwagoal[0] - obstacle_x, dwagoal[1] - obstacle_y)
+        if distance_to_obstacle < min_obstacle_localgoal_distance:
+            skip_goal = True
+            print(f"Skipping local goal {dwagoal} due to nearby obstacle at ({obstacle_x}, {obstacle_y})")
+            break
+
+    if skip_goal:
+        continue  # Skip to the next local goal
+# End- Wen Ci--------------------------------------------------------------------------------------------------------------------------------------------
+
 
     while True:
         u, predicted_trajectory = dwa.dwa_control(x, config, dwagoal, ob)
@@ -315,7 +404,9 @@ for i_goal, dwagoal in enumerate(road_map):
             plt.grid(False)
 
             if save_animation_to_figs:
-                plt.savefig(fig_path)
+                plt.axis('off')
+                #plt.savefig(fig_path)
+                plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
                 i_fig += 1
                 fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
@@ -338,4 +429,3 @@ print("Done")
 if show_animation:  # pragma: no cover
     plt.show()
         
-
