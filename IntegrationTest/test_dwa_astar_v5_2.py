@@ -234,7 +234,7 @@ if show_animation:  # pragma: no cover
         plt.axis('off')
         #plt.savefig(fig_path)
 
-        plt.savefig(fig_path, dpi=200, bbox_inches='tight',  pad_inches=0.1) #We can expriment if higher dpi works with a more powerful PC - need to change for both savefig lines
+        plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1) #We can expriment if higher dpi works with a more powerful PC - need to change for both savefig lines
         i_fig += 1
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
@@ -333,7 +333,7 @@ for i_goal, dwagoal in enumerate(road_map):
             if save_animation_to_figs:
                 plt.axis('off')
                 #plt.savefig(fig_path)
-                plt.savefig(fig_path, dpi=200, bbox_inches='tight',  pad_inches=0.1)
+                plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
                 i_fig += 1
                 fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
