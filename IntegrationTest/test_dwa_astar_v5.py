@@ -19,8 +19,8 @@ import a_star as a_star
 #import a_star_v2 as a_star
 
 # Removes socket error with PyQt5
-import matplotlib
-matplotlib.use('TkAgg')
+# import matplotlib
+# matplotlib.use('TkAgg')
 
 import math
 import numpy as np
