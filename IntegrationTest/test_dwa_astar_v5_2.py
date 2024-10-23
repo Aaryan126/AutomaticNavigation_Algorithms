@@ -128,7 +128,7 @@ except ValueError:
 # ----- Set up the map -----
 ox, oy = [], []
 # Load obstacles from the selected map file
-maps_dir = os.path.join(os.path.dirname(__file__), "Maps")
+maps_dir = os.path.join(os.path.dirname(__file__), "Maps_2")
 map_file = os.path.join(maps_dir, f"{selected_map}.txt")  
 print(map_file)
 
