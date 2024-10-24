@@ -1,5 +1,5 @@
 from PyQt5 import QtWidgets, QtGui, QtCore
-from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup
+from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup, QTextEdit
 from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor, QImage
 from PyQt5.QtCore import QThread, pyqtSignal, QProcess, QTimer, QRect
 import sys
@@ -45,7 +45,7 @@ class Map(QWidget):
         self.setStyleSheet("background-color: white; border: 2px solid black; padding: 1px;")
         self.setGeometry(50, 80, 600, 600)
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
-        self.background_image = None
+        self.background_image = None        
 
     def load_background_image(self, image_path):
         self.background_image = QPixmap(image_path)
@@ -121,7 +121,7 @@ class Map(QWidget):
             painter.setBrush(QBrush(QColor(240, 240, 240)))  # Light gray background
             painter.drawRect(0, 0, self.width(), self.height())
             painter.setPen(QColor(150, 150, 150))  # Gray color for the text
-            painter.setFont(QFont("Arial", 16))
+            painter.setFont(font_button)
             painter.drawText(self.rect(), QtCore.Qt.AlignCenter, "Please select a map")
 
         # Recalculate the dots' positions based on the current size of the map
@@ -381,9 +381,26 @@ class MainWindow(QMainWindow):
         self.btn_notification.setFont(font_button)
         self.btn_notification.move(800, 400)
 
-        self.btn_sensor_data = QtWidgets.QPushButton("Sensor data", self.central_widget)
+        #Initialize button to start reading sensor data
+        self.btn_sensor_data = QPushButton("Sensor data", self.central_widget)
         self.btn_sensor_data.setFont(font_button)
-        self.btn_sensor_data.move(930, 400)
+        self.btn_sensor_data.move(900,400)
+        self.btn_sensor_data.clicked.connect(self.open_sensor_data_window)  # Connect the button click
+
+        # Sensor Data Window (hidden initially)
+        self.sensor_data_window = QWidget(self)
+        self.sensor_data_window.setStyleSheet("background-color: white; border: 1px solid black;")
+        self.sensor_data_window.setGeometry(700, 430, 450, 220)
+        self.sensor_data_window.setWindowTitle("Sensor Data")
+        
+        # QTextEdit for displaying sensor data
+        self.sensor_data_text_edit = QTextEdit(self.sensor_data_window)
+        self.sensor_data_text_edit.setGeometry(10,10,430,200)
+        self.sensor_data_text_edit.setReadOnly(True)
+
+        # Timer for updating sensor data
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.update_sensor_data)
 
         # Create unique windows for each button
         self.dashboard_window = QWidget(self)
@@ -397,12 +414,6 @@ class MainWindow(QMainWindow):
         self.notification_window.setGeometry(700, 430, 450, 220)
         self.notification_label = QLabel("Notifications", self.notification_window)
         self.notification_label.move(10, 10)
-
-        self.sensor_data_window = QWidget(self)
-        self.sensor_data_window.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.sensor_data_window.setGeometry(700, 430, 450, 220)
-        self.sensor_data_label = QLabel("Sensor Data", self.sensor_data_window)
-        self.sensor_data_label.move(10, 10)
 
         # Initially hide all the windows
         self.notification_window.hide()
@@ -430,7 +441,7 @@ class MainWindow(QMainWindow):
         
         self.image_list = []  # List to hold all the image paths
         self.image_index = 0  # To keep track of the current image index
-        self.timer = QTimer(self)  # Timer for updating the images
+        self.timer = QtCore.QTimer(self)  # Timer for updating the images
         self.timer.timeout.connect(self.update_image)  # Call update_image every timeout
         
         self.paused = False
@@ -438,12 +449,54 @@ class MainWindow(QMainWindow):
     def show_window(self, window):
         self.dashboard_window.hide()
         self.notification_window.hide()
-        self.sensor_data_window.hide()
 
         # Show the selected window
         window.show()
 
+    
+    #Show sensor data
+    def open_sensor_data_window(self):
+        self.sensor_data_window.show()  # Show the sensor data window
+        self.sensor_data_text_edit.clear()  # Clear previous content
+        self.update_sensor_data()  # Start the first reading
 
+    #Update sensor data
+    def update_sensor_data(self):
+        try:
+            print("Attempting to read the file...")
+
+            # Clear the current contents of the QTextEdit
+            self.sensor_data_text_edit.clear() 
+
+            # Check if the file exists
+            if not os.path.exists('sensor_data.txt'):
+                self.sensor_data_text_edit.setPlainText("Sensor Data: The file does not exist.")
+                print("The file does not exist.")
+                return
+            
+            with open('sensor_data.txt', 'r') as file:
+                content = file.read().strip()  # Read and strip whitespace
+                
+                if content:
+                    self.sensor_data_text_edit.setPlainText(content)  # Display content
+                else:
+                    self.sensor_data_text_edit.setPlainText("Sensor Data: No data available.")
+            
+            print("File read successfully.")  # Indicate successful read
+        
+        except FileNotFoundError:
+            self.sensor_data_text_edit.setPlainText("Sensor Data: The file was not found.")
+            print("The file was not found.")
+        except IOError as e:
+            self.sensor_data_text_edit.setPlainText("Sensor Data: Error reading data.")
+            print(f"IO Error reading sensor data: {e}")
+        except Exception as e:
+            self.sensor_data_text_edit.setPlainText("Sensor Data: An unexpected error occurred.")
+            print(f"Unexpected error reading sensor data: {e}")
+
+        # Schedule the next call to this method
+        QtCore.QTimer.singleShot(500, self.update_sensor_data)  # Call
+        
     def map_changed(self):
         selected_map = self.map_select.currentText()
 
