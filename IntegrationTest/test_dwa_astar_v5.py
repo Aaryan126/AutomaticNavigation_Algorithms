@@ -1,4 +1,5 @@
 import os, sys, shutil
+from PIL import Image
 
 #Removing 'figs'
 figs_dir = os.path.join(os.path.dirname(__file__), 'figs')
@@ -18,7 +19,7 @@ import dynamic_window_approach_paper as dwa
 import a_star as a_star
 #import a_star_v2 as a_star
 
-# Removes socket error with PyQt5
+# # Removes socket error with PyQt5
 # import matplotlib
 # matplotlib.use('TkAgg')
 
@@ -210,8 +211,10 @@ if show_animation:  # pragma: no cover
         plt.gca().add_patch(circle)
     plt.plot(sx, sy, "og") #Start coord
     plt.plot(gx, gy, "*b") #Goal coord
-    plt.grid(True)
-    plt.axis("equal")
+    #plt.grid(True)
+    plt.xlim(0, 60)
+    plt.ylim(0, 60)
+    plt.axis("off")
 
 # ----- Run A* path planning -----
 a_star_planner = a_star.AStarPlanner(
@@ -232,14 +235,20 @@ if show_animation:  # pragma: no cover
     #plt.pause(0.1)
     plt.pause(0.001)
     
-    plt.grid(False)
+    plt.grid(True)
 
     if save_animation_to_figs:
         
-        plt.axis('off')
         #plt.savefig(fig_path)
-
-        plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1) #We can expriment if higher dpi works with a more powerful PC - need to change for both savefig lines
+        plt.xlim(0, 60)
+        plt.ylim(0, 60)
+        # Set major ticks for the grid (e.g., every 10 units)
+        #plt.xticks(range(0, 61, 10), [])  # Empty list to hide x-axis tick labels
+        #plt.yticks(range(0, 61, 10), [])  # Empty list to hide y-axis tick labels
+        #plt.grid(True)
+        plt.savefig(fig_path, dpi=150, bbox_inches='tight', pad_inches = 0) #We can expriment if higher dpi works with a more powerful PC - need to change for both savefig lines
+        plt.axis('off')
+        
         i_fig += 1
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
@@ -329,7 +338,7 @@ while True:
 print('Local obstacles plotted!')
 
 # End- Wen Ci-------------------------------------------------------------------------------------------------------------------------------------------
-
+#print("Printing ob", ob)
 # ----- Run DWA path planning -----
 x = np.array([sx, sy, math.pi / 8.0, 1.0, 0.0])
 # config = Config()
@@ -370,10 +379,13 @@ for i_goal, dwagoal in enumerate(road_map):
         continue
 
 # Start- Wen Ci------------------------------------------------------------------------------------------------------------------------------------------
-    # Check if the local goal is too close to any added obstacles  
+    # Check if the local goal is too close to any added obstacles
+    
     skip_goal = False
     for (obstacle_x, obstacle_y) in ob:
+        #print("Printing ob", ob)  
         distance_to_obstacle = math.hypot(dwagoal[0] - obstacle_x, dwagoal[1] - obstacle_y)
+        #print("Checking dist", distance_to_obstacle) 
         if distance_to_obstacle < min_obstacle_localgoal_distance:
             skip_goal = True
             print(f"Skipping local goal {dwagoal} due to nearby obstacle at ({obstacle_x}, {obstacle_y})")
@@ -400,13 +412,20 @@ for i_goal, dwagoal in enumerate(road_map):
             plt_elements.append(plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")[0])
             #plt.pause(0.1)
             plt.pause(0.001)
-            
-            plt.grid(False)
+            #plt.pause(0.001)
+            #plt.grid(False)
 
             if save_animation_to_figs:
+                plt.xlim(0, 60)
+                plt.ylim(0, 60)
+                # Set major ticks for the grid (e.g., every 10 units)
+                # plt.xticks(range(0, 61, 10), [])  # Empty list to hide x-axis tick labels
+                # plt.yticks(range(0, 61, 10), [])  # Empty list to hide y-axis tick labels
+                # #plt.savefig(fig_path)
+                # plt.grid(True)
+                plt.savefig(fig_path, dpi=150, bbox_inches='tight', pad_inches = 0) #We can expriment if higher dpi works with a more powerful PC - need to change for both savefig lines
                 plt.axis('off')
-                #plt.savefig(fig_path)
-                plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
+                #plt.savefig(fig_path, dpi=150, bbox_inches='tight', pad_inches = 0)
                 i_fig += 1
                 fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
@@ -429,3 +448,4 @@ print("Done")
 if show_animation:  # pragma: no cover
     plt.show()
         
+
