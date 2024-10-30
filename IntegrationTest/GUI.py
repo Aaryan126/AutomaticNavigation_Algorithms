@@ -13,6 +13,7 @@ font_title = QFont('Athelas', 16)
 font_title.setBold(True)
 
 font_button = QFont('Athelas', 12)
+font_dashboard = QFont('Athelas', 12)
 
 class BackendWorker(QThread):
     result_ready = pyqtSignal(str)
@@ -43,11 +44,6 @@ class Map(QWidget):
     start_click_enabled = pyqtSignal()  # Signal to enable startpoint click
     end_click_enabled = pyqtSignal()  # Signal to enable endpoint click
     local_obstacle_click_enabled = pyqtSignal()  # Signal to enable local obstacle click
-    startpoint_click_enabled = False # Flag to check if map click is enabled
-    endpoint_click_enabled = False
-    local_obstacle_point_click_enabled = False
-
-
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -56,6 +52,9 @@ class Map(QWidget):
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.background_image = None
 
+        #self.startpoint_click_enabled = False # Flag to check if map click is enabled
+        #self.endpoint_click_enabled = False
+        #self.local_obstacle_point_click_enabled = False
         self.start_click_enabled.connect(self.enable_startpoint_click)
         self.end_click_enabled.connect(self.enable_endpoint_click)
         self.local_obstacle_click_enabled.connect(self.enable_local_obstacle_click)
@@ -285,12 +284,12 @@ class MainWindow(QMainWindow):
         # Command buttons
         self.btn_resume = QtWidgets.QPushButton("Resume", self.central_widget)
         self.btn_resume.setFont(font_button)
-        # self.btn_resume.move(700, 80)
+        # self.btn_resume.move(700, 70)
         self.btn_resume.clicked.connect(self.resume)
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
-        # self.btn_pause.move(820, 80)
+        # self.btn_pause.move(820, 70)
         self.btn_pause.clicked.connect(self.pause)
 
         self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
@@ -315,7 +314,13 @@ class MainWindow(QMainWindow):
 
         # Map selection
         self.map_select = QComboBox(self)
-        # self.map_select.setGeometry(1000, 70, 150, 30)
+        self.map_select.setGeometry(980, 70, 150, 30)
+
+        self.label_map_select = QLabel("Map Select:", self)
+        self.label_map_select.setFont(font_title)
+        self.label_map_select.setGeometry(980, 40, 150, 20)
+
+
 
         self.map_select.addItem("Select")
         self.map_select.addItem("Map 1")
@@ -390,7 +395,7 @@ class MainWindow(QMainWindow):
 
 
         self.label_sensor_data = QLabel(self.central_widget)
-        self.label_sensor_data.setText("Sensor Data")
+        self.label_sensor_data.setText("Dashboard")
         self.label_sensor_data.setFont(font_title)
         self.label_sensor_data.adjustSize()
         self.label_sensor_data.move(700, 400)
@@ -535,7 +540,6 @@ class MainWindow(QMainWindow):
         self.joystick.updateJoystickProperties(new_circle_radius, new_joystick_radius)
         self.joystick.setGeometry(int(700 * scale_x), int(160 * scale_y), new_circle_radius * 2, new_circle_radius * 2)
 
-
     def resizeEvent(self, event):
         new_width = self.width()
         new_height = self.height()
@@ -547,28 +551,30 @@ class MainWindow(QMainWindow):
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
         self.label_map.move(int(50 * scale_x), int(30 * scale_y))
-        self.btn_resume.move(int(700 * scale_x), int(80 * scale_y))
-        self.btn_pause.move(int(820 * scale_x), int(80 * scale_y))
+        self.btn_resume.move(int(700 * scale_x), int(70 * scale_y))
+        self.btn_pause.move(int(820 * scale_x), int(70 * scale_y))
         self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
         self.btn_start.move(int(820 * scale_x), int(110 * scale_y))
-        # self.joystick.move(int(700 * scale_x), int(160 * scale_y))
         self.resizeJoystick(scale_x, scale_y)
-        self.label_locate.move(int(980 * scale_x), int(250 * scale_y))  #
-        self.btn_startpoint.setGeometry(int(980 * scale_x), int(280 * scale_y), int(170 * scale_x), int(25 * scale_y))
-        self.btn_endpoint.setGeometry(int(980 * scale_x), int(310 * scale_y), int(170 * scale_x), int(25 * scale_y))
-        self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
 
-        self.map_select.setGeometry(int(980 * scale_x), int(80 * scale_y), int(170 * scale_x), int(30 * scale_y))
+        self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
+        self.btn_startpoint.move(int(980 * scale_x), int(330 * scale_y))
+        self.btn_endpoint.move(int(980 * scale_x), int(360 * scale_y))
+        self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
+        self.map_select.setGeometry(int(980 * scale_x), int(70 * scale_y), int(150 * scale_x), int(30 * scale_y))
+        self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
+        # In your resizeEvent method, add the following for label_map_select
+        self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
 
         self.label_shipsize.move(int(980 * scale_x), int(120 * scale_y))
-        self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(170 * scale_x), int(30 * scale_y))
-        self.label_length.move(int(980 * scale_x), int(195 * scale_y))
-        self.label_width.move(int(980 * scale_x), int(225 * scale_y))
-        self.label_radius.move(int(980 * scale_x), int(205 * scale_y))
-        self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.btn_setship.setGeometry(int(980 * scale_x), int(360 * scale_y), int(170 * scale_x), int(25 * scale_y)) 
+        self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(150 * scale_x), int(30 * scale_y))
+        self.label_length.move(int(980 * scale_x), int(190 * scale_y))
+        self.label_width.move(int(980 * scale_x), int(220 * scale_y))
+        self.label_radius.move(int(980 * scale_x), int(200 * scale_y))
+        self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(100 * scale_x), int(25 * scale_y))
+        self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(100 * scale_x), int(25 * scale_y))
+        self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(100 * scale_x), int(25 * scale_y))
+        self.btn_setship.move(int(980 * scale_x), int(250 * scale_y))
 
         #scaling for customize widget window
         self.customize_widget.setGeometry(int(700*scale_x), int(30*scale_y), int(450*scale_x), int(350*scale_y))
@@ -579,12 +585,10 @@ class MainWindow(QMainWindow):
         self.customize_widget.clear_all.setGeometry(int(135*scale_x), int(250*scale_y), int(200*scale_x), int(40*scale_y))
         
         # Adjust window size
-        # for window in [self.dashboard_window, self.notification_window, self.sensor_data_window]:
-        #     window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
-        self.sensor_data_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
-        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(430 * scale_x), int(230 * scale_y))
-      
-      
+        self.sensor_data_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
+        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(430 * scale_x), int(200 * scale_y))
+
+
     def load_images(self):
         figs_folder = 'figs'  # Change this to your actual path
         self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) 
@@ -618,7 +622,7 @@ class MainWindow(QMainWindow):
             elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(length), str(width), selected_map]         
+                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(length), str(width), selected_map]
 
             self.run_subprocess(command)
             # Start the 5 seconds delay
@@ -680,7 +684,7 @@ class MainWindow(QMainWindow):
         else:
             # No images in the list initially, stop the timer
             self.timer.stop()
-        
+    
     def resume(self):
         if self.paused:
             self.paused = False  # Resume if paused
@@ -724,7 +728,6 @@ class MainWindow(QMainWindow):
         print("End Point button clicked.")
         self.map.end_click_enabled.emit()  # Emit the signal to enable map clicks
 
-            
 def main():
     app = QApplication(sys.argv)
     main_window = MainWindow()
