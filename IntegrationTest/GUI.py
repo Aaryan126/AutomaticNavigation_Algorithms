@@ -43,6 +43,11 @@ class Map(QWidget):
     start_click_enabled = pyqtSignal()  # Signal to enable startpoint click
     end_click_enabled = pyqtSignal()  # Signal to enable endpoint click
     local_obstacle_click_enabled = pyqtSignal()  # Signal to enable local obstacle click
+    startpoint_click_enabled = False # Flag to check if map click is enabled
+    endpoint_click_enabled = False
+    local_obstacle_point_click_enabled = False
+
+
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -51,9 +56,6 @@ class Map(QWidget):
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.background_image = None
 
-        #self.startpoint_click_enabled = False # Flag to check if map click is enabled
-        #self.endpoint_click_enabled = False
-        #self.local_obstacle_point_click_enabled = False
         self.start_click_enabled.connect(self.enable_startpoint_click)
         self.end_click_enabled.connect(self.enable_endpoint_click)
         self.local_obstacle_click_enabled.connect(self.enable_local_obstacle_click)
@@ -125,25 +127,6 @@ class Map(QWidget):
             # Write the inputs to the file, each on a new line
             file.write(f"[{relative_x}, {relative_y}]\n")
         print(f"Data saved to {filename}")
-
-    # def send_coordinates_to_backend(self, relative_x, relative_y):
-    # #Send the clicked coordinates to the backend algorithm using QThread to avoid blocking the GUI.
-    #     try:
-    #         # Convert relative coordinates to absolute positions based on the map size
-    #         map_width = self.width()
-    #         map_height = self.height()
-    #         abs_x = int(relative_x * map_width)
-    #         abs_y = int(relative_y * map_height)
-
-    #         print(f"Sending coordinates to backend: {abs_x}, {abs_y}")
-
-    #         # Run the backend in a separate thread to avoid blocking the GUI
-    #         self.worker_thread = BackendWorker(abs_x, abs_y)
-    #         self.worker_thread.result_ready.connect(self.on_backend_result)
-    #         self.worker_thread.resume()
-
-    #     except Exception as e:
-    #         print(f"Error sending coordinates to backend: {e}")
 
     def on_backend_result(self, result):
         """Handle the result from the backend worker."""
@@ -292,23 +275,6 @@ class MainWindow(QMainWindow):
         self.central_widget = QWidget(self)
         self.setCentralWidget(self.central_widget)
 
-        # Code used for testing only !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        # self.resume_label = QLabel(self.central_widget)
-        # self.resume_label.setText("Resume-:")
-        # self.resume_label.move(200, 30)
-        # self.resume_x_edit = QLineEdit(self.central_widget)
-        # self.resume_x_edit.setGeometry(250, 30, 50, 25)
-        # self.resume_y_edit = QLineEdit(self.central_widget)
-        # self.resume_y_edit.setGeometry(300, 30, 50, 25)
-
-        # self.end_label = QLabel(self.central_widget)
-        # self.end_label.setText("End-:")
-        # self.end_label.move(400, 30)
-        # self.end_x_edit = QLineEdit(self.central_widget)
-        # self.end_x_edit.setGeometry(450, 30, 50, 25)
-        # self.end_y_edit = QLineEdit(self.central_widget)
-        # self.end_y_edit.setGeometry(500, 30, 50, 25)
-
         # Command Label
         self.label_command = QLabel(self.central_widget)
         self.label_command.setText("Command:")
@@ -319,12 +285,12 @@ class MainWindow(QMainWindow):
         # Command buttons
         self.btn_resume = QtWidgets.QPushButton("Resume", self.central_widget)
         self.btn_resume.setFont(font_button)
-        self.btn_resume.move(700, 70)
+        # self.btn_resume.move(700, 80)
         self.btn_resume.clicked.connect(self.resume)
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
-        self.btn_pause.move(820, 70)
+        # self.btn_pause.move(820, 80)
         self.btn_pause.clicked.connect(self.pause)
 
         self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
@@ -349,13 +315,7 @@ class MainWindow(QMainWindow):
 
         # Map selection
         self.map_select = QComboBox(self)
-        self.map_select.setGeometry(980, 70, 150, 30)
-
-        self.label_map_select = QLabel("Map Select:", self)
-        self.label_map_select.setFont(font_title)
-        self.label_map_select.setGeometry(980, 40, 150, 20)
-
-
+        # self.map_select.setGeometry(1000, 70, 150, 30)
 
         self.map_select.addItem("Select")
         self.map_select.addItem("Map 1")
@@ -365,7 +325,7 @@ class MainWindow(QMainWindow):
         self.map_select.addItem("Map 5")
         self.map_select.addItem("SG")
         self.map_select.addItem("NY")
-        self.map_select.addItem("Customize")
+        # self.map_select.addItem("Customize")
         self.map_select.currentIndexChanged.connect(self.map_changed)
 
         # Set ship size and shape
@@ -430,7 +390,7 @@ class MainWindow(QMainWindow):
 
 
         self.label_sensor_data = QLabel(self.central_widget)
-        self.label_sensor_data.setText("Dashboard")
+        self.label_sensor_data.setText("Sensor Data")
         self.label_sensor_data.setFont(font_title)
         self.label_sensor_data.adjustSize()
         self.label_sensor_data.move(700, 400)
@@ -477,8 +437,6 @@ class MainWindow(QMainWindow):
     #Update sensor data
     def update_sensor_data(self):
         try:
-            # print("Attempting to read the file...")
-
             # Clear the current contents of the QTextEdit
             self.sensor_data_text_edit.clear() 
 
@@ -495,8 +453,6 @@ class MainWindow(QMainWindow):
                     self.sensor_data_text_edit.setPlainText(content)  # Display content
                 else:
                     self.sensor_data_text_edit.setPlainText("Sensor Data: No data available.")
-            
-            # print("File read successfully.")  # Indicate successful read
         
         except FileNotFoundError:
             self.sensor_data_text_edit.setPlainText("Sensor Data: The file was not found.")
@@ -591,30 +547,28 @@ class MainWindow(QMainWindow):
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
         self.label_map.move(int(50 * scale_x), int(30 * scale_y))
-        self.btn_resume.move(int(700 * scale_x), int(70 * scale_y))
-        self.btn_pause.move(int(820 * scale_x), int(70 * scale_y))
+        self.btn_resume.move(int(700 * scale_x), int(80 * scale_y))
+        self.btn_pause.move(int(820 * scale_x), int(80 * scale_y))
         self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
         self.btn_start.move(int(820 * scale_x), int(110 * scale_y))
+        # self.joystick.move(int(700 * scale_x), int(160 * scale_y))
         self.resizeJoystick(scale_x, scale_y)
-
-        self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
-        self.btn_startpoint.move(int(980 * scale_x), int(330 * scale_y))
-        self.btn_endpoint.move(int(980 * scale_x), int(360 * scale_y))
+        self.label_locate.move(int(980 * scale_x), int(250 * scale_y))  #
+        self.btn_startpoint.setGeometry(int(980 * scale_x), int(280 * scale_y), int(170 * scale_x), int(25 * scale_y))
+        self.btn_endpoint.setGeometry(int(980 * scale_x), int(310 * scale_y), int(170 * scale_x), int(25 * scale_y))
         self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
-        self.map_select.setGeometry(int(980 * scale_x), int(70 * scale_y), int(150 * scale_x), int(30 * scale_y))
-        self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
-        # In your resizeEvent method, add the following for label_map_select
-        self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
+
+        self.map_select.setGeometry(int(980 * scale_x), int(80 * scale_y), int(170 * scale_x), int(30 * scale_y))
 
         self.label_shipsize.move(int(980 * scale_x), int(120 * scale_y))
-        self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(150 * scale_x), int(30 * scale_y))
-        self.label_length.move(int(980 * scale_x), int(190 * scale_y))
-        self.label_width.move(int(980 * scale_x), int(220 * scale_y))
-        self.label_radius.move(int(980 * scale_x), int(200 * scale_y))
-        self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(100 * scale_x), int(25 * scale_y))
-        self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(100 * scale_x), int(25 * scale_y))
-        self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(100 * scale_x), int(25 * scale_y))
-        self.btn_setship.move(int(980 * scale_x), int(250 * scale_y))
+        self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(170 * scale_x), int(30 * scale_y))
+        self.label_length.move(int(980 * scale_x), int(195 * scale_y))
+        self.label_width.move(int(980 * scale_x), int(225 * scale_y))
+        self.label_radius.move(int(980 * scale_x), int(205 * scale_y))
+        self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.btn_setship.setGeometry(int(980 * scale_x), int(360 * scale_y), int(170 * scale_x), int(25 * scale_y)) 
 
         #scaling for customize widget window
         self.customize_widget.setGeometry(int(700*scale_x), int(30*scale_y), int(450*scale_x), int(350*scale_y))
@@ -625,15 +579,10 @@ class MainWindow(QMainWindow):
         self.customize_widget.clear_all.setGeometry(int(135*scale_x), int(250*scale_y), int(200*scale_x), int(40*scale_y))
         
         # Adjust window size
-        self.sensor_data_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
-        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(430 * scale_x), int(200 * scale_y))
-
-    # def load_images(self):
-    #     figs_folder = 'figs'  # Change this to your actual path
-    #     self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) if img.startswith('frame_') and img.endswith('.png')])
-
-    #     if self.image_list:
-    #         QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval
+        # for window in [self.dashboard_window, self.notification_window, self.sensor_data_window]:
+        #     window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
+        self.sensor_data_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
+        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(430 * scale_x), int(230 * scale_y))
       
       
     def load_images(self):
@@ -660,11 +609,6 @@ class MainWindow(QMainWindow):
         self.map.local_obstacle_click_enabled.emit()  # Emit the signal to enable map clicks
     
         try:
-            # Read coordinates from input fields
-            # resume_x = float(self.resume_x_edit.text())
-            # resume_y = float(self.resume_y_edit.text())
-            # end_x = float(self.end_x_edit.text())
-            # end_y = float(self.end_y_edit.text())
             selected_map = self.map_select.currentText()
         
             
@@ -674,16 +618,7 @@ class MainWindow(QMainWindow):
             elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(length), str(width), selected_map]
-            
-            # Start subprocess
-            # self.process.start('python', command)   
-            
-            #Start subprocess in background without showing it
-            # if os.name == 'nt':
-            #     startupinfo = subprocess.STARTUPINFO()
-            #     startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            #     self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)             
+                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(length), str(width), selected_map]         
 
             self.run_subprocess(command)
             # Start the 5 seconds delay
@@ -707,11 +642,6 @@ class MainWindow(QMainWindow):
                 # Load the image as QImage
                 image = QImage(image_path)
 
-                # # Define crop amounts
-                # crop_top = 70
-                # crop_bottom = 65
-                # crop_left = 155
-                # crop_right = 140
                 crop_top = 50
                 crop_bottom = 50
                 crop_left = 50
@@ -725,26 +655,12 @@ class MainWindow(QMainWindow):
 
                 # Create the cropping rectangle
                 crop_rect = QRect(crop_left, crop_top, new_width, new_height)
-                #self.timer.start(1000) #Added a 1 second pause because there was occassionaly a scaling error where the image wasn't shown
 
                 # Crop the image
                 cropped_image = image.copy(crop_rect)
 
-                # Resize the cropped image to desired dimensions (optional)
-                #desired_width = 600  # Set your desired width after cropping
-                #desired_height = 400  # Set your desired height after cropping
-                #resized_image = cropped_image.scaled(desired_width, desired_height, QtCore.Qt.KeepAspectRatio)
-                # resized_image = cropped_image.scaled(
-                #     desired_width, 
-                #     desired_height, 
-                #     QtCore.Qt.KeepAspectRatio, 
-                #     QtCore.Qt.SmoothTransformation
-                # )
-
                 # Use the map's load_background_image function with the resized image
                 self.map.load_background_image(QPixmap.fromImage(cropped_image))  # Load the resized image
-                #self.map.load_background_image(QPixmap.fromImage(resized_image))  # Load the resized image
-                #self.map.load_background_image(QPixmap.fromImage(image))  # Load the image
 
                 self.image_index += 1  # Move to the next image
             else:
@@ -764,12 +680,6 @@ class MainWindow(QMainWindow):
         else:
             # No images in the list initially, stop the timer
             self.timer.stop()
-    
-    # def toggle_pause(self):
-    #     if self.paused:
-    #         self.resume()  # If paused, resume
-    #     else:
-    #         self.pause()  # If playing, pause
         
     def resume(self):
         if self.paused:
@@ -814,10 +724,6 @@ class MainWindow(QMainWindow):
         print("End Point button clicked.")
         self.map.end_click_enabled.emit()  # Emit the signal to enable map clicks
 
-    # def on_set_clicked(self):
-    #     """Trigger the signal to allow map clicks."""
-    #     print("Set button clicked.")
-    #     self.map.local_obstacle_click_enabled.emit()  # Emit the signal to enable map clicks
             
 def main():
     app = QApplication(sys.argv)
