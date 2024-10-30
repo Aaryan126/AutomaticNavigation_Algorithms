@@ -124,7 +124,7 @@ class Map(QWidget):
 
     def save_local_obstacle_to_file(self, relative_x, relative_y, filename='local_obstacles.txt'):
         print('open file')
-        with open(filename, 'w') as file:
+        with open(filename, 'w+') as file:
             # Write the inputs to the file, each on a new line
             file.write(f"[{relative_x}, {relative_y}]\n")
         print(f"Data saved to {filename}")
