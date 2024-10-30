@@ -51,12 +51,12 @@ class Map(QWidget):
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.background_image = None
 
-        self.startpoint_click_enabled = False # Flag to check if map click is enabled
-        self.endpoint_click_enabled = False
-        self.local_obstacle_point_click_enabled = False
+        #self.startpoint_click_enabled = False # Flag to check if map click is enabled
+        #self.endpoint_click_enabled = False
+        #self.local_obstacle_point_click_enabled = False
         self.start_click_enabled.connect(self.enable_startpoint_click)
         self.end_click_enabled.connect(self.enable_endpoint_click)
-        self.local_obstacle_click_enabled.connect(self.enable_endpoint_click)
+        self.local_obstacle_click_enabled.connect(self.enable_local_obstacle_click)
 
     def load_background_image(self, image_path):
         self.background_image = QPixmap(image_path)
@@ -424,7 +424,7 @@ class MainWindow(QMainWindow):
 
 
         self.label_sensor_data = QLabel(self.central_widget)
-        self.label_sensor_data.setText("Sensor Data")
+        self.label_sensor_data.setText("Dashboard")
         self.label_sensor_data.setFont(font_title)
         self.label_sensor_data.adjustSize()
         self.label_sensor_data.move(700, 400)
