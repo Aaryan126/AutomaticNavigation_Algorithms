@@ -92,35 +92,67 @@ class Config:
 config = Config()
 
 
+
+# Start- Wen Ci-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
 # ----- Set up the start and goal positions -----
 # Set the start and goal positions
-sx, sy = 10.0, 10.0
-gx, gy = 50.0, 50.0
+# Get start point
+# Open the file and read the data
+with open('start_point.txt', 'r+') as file:
+    startpoint = file.read().strip()  # Read and remove any whitespace
+    # Clear file
+    file.seek(0)
+    file.truncate()
+
+# Convert the string data to a list
+startpoint_list = eval(startpoint)
+print('Start point received:', startpoint_list)
+
+# Assign values to sx and sy
+sx, sy = startpoint_list[0], startpoint_list[1]
+
+# Get end point
+# Open the file and read the data
+with open('end_point.txt', 'r+') as file:
+    endpoint = file.read().strip()  # Read and remove any whitespace
+    # Clear file
+    file.seek(0)
+    file.truncate()
+
+# Convert the string data to a list
+endpoint_list = eval(endpoint)
+print('End point received:', endpoint_list)
+
+# Assign values to sx and sy
+gx, gy = endpoint_list[0], endpoint_list[1]
+
+# End- Wen Ci--------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Start -Aaryan
 # ---- Getting starting and goal coordinates from GUI ---- 
 
-if len(sys.argv) not in [7, 8]:  # 7 arguments for circle, 8 for rectangle
+if len(sys.argv) not in [3, 4]:  # 7 arguments for circle, 8 for rectangle
     print("Usage: python robot_controller.py start_x start_y end_x end_y [length width] OR [radius]")
     sys.exit(1)
 
 try:
-    # Read coordinates from command-line arguments
-    sx = float(sys.argv[1])
-    sy = float(sys.argv[2])
-    gx = float(sys.argv[3])
-    gy = float(sys.argv[4])
+    # # Read coordinates from command-line arguments
+    # sx = float(sys.argv[1])
+    # sy = float(sys.argv[2])
+    # gx = float(sys.argv[3])
+    # gy = float(sys.argv[4])
 
-    if len(sys.argv) == 8: # For rectangle
+    if len(sys.argv) == 4: # For rectangle
         config.robot_type = dwa.RobotType.rectangle
-        config.robot_length = float(sys.argv[5])
-        config.robot_width = float(sys.argv[6])
-        selected_map = sys.argv[7]
-    elif len(sys.argv) == 7: # For circle
+        config.robot_length = float(sys.argv[1])
+        config.robot_width = float(sys.argv[2])
+        selected_map = sys.argv[3]
+    elif len(sys.argv) == 3: # For circle
         config.robot_type = dwa.RobotType.circle
-        config.robot_radius = float(sys.argv[5])
+        config.robot_radius = float(sys.argv[1])
         config.robot_dim = config.robot_radius
-        selected_map = sys.argv[6]
+        selected_map = sys.argv[2]
         
     
     
@@ -282,7 +314,7 @@ if show_animation:  # pragma: no cover
 # Read local obstacles from file
 def read_new_obstacles():
     new_ob_list = []
-    with open('transition.txt', 'r+') as pipe:
+    with open('local_obstacles.txt', 'r+') as pipe:
         while True:
             time.sleep(0.5)
             data = pipe.readline().strip()
