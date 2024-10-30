@@ -105,8 +105,9 @@ for i in range(15):
     oy.append(45.0)
 
 ob = np.array([ox, oy]).transpose()
+# ----- Set up the map -----
+ob1 = [20,20]
 
-ob1 = [10,10]
 
 # ----- Set up the start and goal positions -----
 sx, sy = 10.0, 10.0  # Start position
@@ -312,16 +313,22 @@ for i_goal, dwagoal in enumerate(road_map):
             plt_elements.extend(dwa.plot_robot(x[0], x[1], x[2], config))
             plt_elements.extend(dwa.plot_arrow(x[0], x[1], x[2]))
             plt_elements.append(plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")[0])
-            
-            ob1[0],ob1[1] =ob1[0]+0.01,ob1[1]+0.01
-            print(ob1)
-            plt_elements.append(plt.plot(ob1[0],ob1[1], "xr")[0])
-            plt.pause(0.001)
 
-            if save_animation_to_figs:
-                plt.savefig(fig_path)
-                i_fig += 1
-                fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
+            if ob1[0]<30 or ob1[1]<30:
+                ob1[0],ob1[1] =ob1[0]+0.01,ob1[1]+0.01
+                print(ob1)
+                plt_elements.append(plt.plot(ob1[0],ob1[1], "xr")[0])
+                plt.pause(0.001)
+                if save_animation_to_figs:
+                    plt.savefig(fig_path)
+                    i_fig += 1
+                    fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
+
+            else:
+                if save_animation_to_figs:
+                    plt.savefig(fig_path)
+                    i_fig += 1
+                    fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
         # Check if the goal or local goal is reached
         dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1])
