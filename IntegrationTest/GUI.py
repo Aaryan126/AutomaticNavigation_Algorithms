@@ -351,6 +351,12 @@ class MainWindow(QMainWindow):
         self.map_select = QComboBox(self)
         self.map_select.setGeometry(980, 70, 150, 30)
 
+        self.label_map_select = QLabel("Map Select:", self)
+        self.label_map_select.setFont(font_title)
+        self.label_map_select.setGeometry(980, 40, 150, 20)
+
+
+
         self.map_select.addItem("Select")
         self.map_select.addItem("Map 1")
         self.map_select.addItem("Map 2")
@@ -596,7 +602,10 @@ class MainWindow(QMainWindow):
         self.btn_endpoint.move(int(980 * scale_x), int(360 * scale_y))
         self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
         self.map_select.setGeometry(int(980 * scale_x), int(70 * scale_y), int(150 * scale_x), int(30 * scale_y))
-        self.label_sensor_data.move(int(700 * scale_x), int(400*scale_y))
+        self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
+        # In your resizeEvent method, add the following for label_map_select
+        self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
+
         self.label_shipsize.move(int(980 * scale_x), int(120 * scale_y))
         self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(150 * scale_x), int(30 * scale_y))
         self.label_length.move(int(980 * scale_x), int(190 * scale_y))
