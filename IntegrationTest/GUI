@@ -43,6 +43,11 @@ class Map(QWidget):
     start_click_enabled = pyqtSignal()  # Signal to enable startpoint click
     end_click_enabled = pyqtSignal()  # Signal to enable endpoint click
     local_obstacle_click_enabled = pyqtSignal()  # Signal to enable local obstacle click
+    startpoint_click_enabled = False # Flag to check if map click is enabled
+    endpoint_click_enabled = False
+    local_obstacle_point_click_enabled = False
+
+
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -51,12 +56,12 @@ class Map(QWidget):
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.background_image = None
 
-        self.startpoint_click_enabled = False # Flag to check if map click is enabled
-        self.endpoint_click_enabled = False
-        self.local_obstacle_point_click_enabled = False
+        # self.startpoint_click_enabled = False # Flag to check if map click is enabled
+        # self.endpoint_click_enabled = False
+        # self.local_obstacle_point_click_enabled = False
         self.start_click_enabled.connect(self.enable_startpoint_click)
         self.end_click_enabled.connect(self.enable_endpoint_click)
-        self.local_obstacle_click_enabled.connect(self.enable_endpoint_click)
+        self.local_obstacle_click_enabled.connect(self.enable_local_obstacle_click)
 
     def load_background_image(self, image_path):
         self.background_image = QPixmap(image_path)
@@ -286,21 +291,21 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.central_widget)
 
         # Code used for testing only !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        self.resume_label = QLabel(self.central_widget)
-        self.resume_label.setText("Resume-:")
-        self.resume_label.move(200, 30)
-        self.resume_x_edit = QLineEdit(self.central_widget)
-        self.resume_x_edit.setGeometry(250, 30, 50, 25)
-        self.resume_y_edit = QLineEdit(self.central_widget)
-        self.resume_y_edit.setGeometry(300, 30, 50, 25)
+        # self.resume_label = QLabel(self.central_widget)
+        # self.resume_label.setText("Resume-:")
+        # self.resume_label.move(200, 30)
+        # self.resume_x_edit = QLineEdit(self.central_widget)
+        # self.resume_x_edit.setGeometry(250, 30, 50, 25)
+        # self.resume_y_edit = QLineEdit(self.central_widget)
+        # self.resume_y_edit.setGeometry(300, 30, 50, 25)
 
-        self.end_label = QLabel(self.central_widget)
-        self.end_label.setText("End-:")
-        self.end_label.move(400, 30)
-        self.end_x_edit = QLineEdit(self.central_widget)
-        self.end_x_edit.setGeometry(450, 30, 50, 25)
-        self.end_y_edit = QLineEdit(self.central_widget)
-        self.end_y_edit.setGeometry(500, 30, 50, 25)
+        # self.end_label = QLabel(self.central_widget)
+        # self.end_label.setText("End-:")
+        # self.end_label.move(400, 30)
+        # self.end_x_edit = QLineEdit(self.central_widget)
+        # self.end_x_edit.setGeometry(450, 30, 50, 25)
+        # self.end_y_edit = QLineEdit(self.central_widget)
+        # self.end_y_edit.setGeometry(500, 30, 50, 25)
 
         # Command Label
         self.label_command = QLabel(self.central_widget)
@@ -469,7 +474,7 @@ class MainWindow(QMainWindow):
         
         # QLabel to display the map image (initialize it here)
         self.map_image = QLabel(self.central_widget)
-        self.map_image.setGeometry(50, 80, 600, 570)
+        self.map_image.setGeometry(50, 80, 600, 600)
         self.map_image.setStyleSheet("border: 1px solid black;")
         self.map_image.setScaledContents(True)  # To make the image scale properly
         self.map_image.hide() #Testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -504,7 +509,7 @@ class MainWindow(QMainWindow):
     #Update sensor data
     def update_sensor_data(self):
         try:
-            print("Attempting to read the file...")
+            # print("Attempting to read the file...")
 
             # Clear the current contents of the QTextEdit
             self.sensor_data_text_edit.clear() 
@@ -523,7 +528,7 @@ class MainWindow(QMainWindow):
                 else:
                     self.sensor_data_text_edit.setPlainText("Sensor Data: No data available.")
             
-            print("File read successfully.")  # Indicate successful read
+            # print("File read successfully.")  # Indicate successful read
         
         except FileNotFoundError:
             self.sensor_data_text_edit.setPlainText("Sensor Data: The file was not found.")
@@ -616,7 +621,7 @@ class MainWindow(QMainWindow):
         self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
         self.btn_startpoint.move(int(980 * scale_x), int(330 * scale_y))
         self.btn_endpoint.move(int(980 * scale_x), int(360 * scale_y))
-        self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(570 * scale_y))
+        self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
 
         self.btn_dashboard.move(int(700 * scale_x), int(400 * scale_y))
         self.btn_notification.move(int(800 * scale_x), int(400 * scale_y))
@@ -676,22 +681,23 @@ class MainWindow(QMainWindow):
     def set(self): #Anything changed in this GUI script after we press "set" will not be changed because of the subprocess (matplotlib) running takes over all of the computing power
         print("Set button clicked.")
         self.map.local_obstacle_click_enabled.emit()  # Emit the signal to enable map clicks
+    
         try:
             # Read coordinates from input fields
-            resume_x = float(self.resume_x_edit.text())
-            resume_y = float(self.resume_y_edit.text())
-            end_x = float(self.end_x_edit.text())
-            end_y = float(self.end_y_edit.text())
+            # resume_x = float(self.resume_x_edit.text())
+            # resume_y = float(self.resume_y_edit.text())
+            # end_x = float(self.end_x_edit.text())
+            # end_y = float(self.end_y_edit.text())
             selected_map = self.map_select.currentText()
         
             
             if self.ship_shape.currentText() == "Circle":
                 radius = float(self.radius_input.text())
-                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(resume_x), str(resume_y), str(end_x), str(end_y), str(radius), selected_map]
+                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(radius), selected_map]
             elif self.ship_shape.currentText() == "Rectangle":
                 length = float(self.length_input.text())
                 width = float(self.width_input.text())
-                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(resume_x), str(resume_y), str(end_x), str(end_y), str(length), str(width), selected_map]
+                command = [os.path.join(os.path.dirname(os.path.realpath(__file__)),'test_dwa_astar_v5.py'), str(length), str(width), selected_map]
             
             # Start subprocess
             # self.process.start('python', command)   
@@ -807,7 +813,7 @@ class MainWindow(QMainWindow):
 
     def start(self):
         print("Pressed Start")
-        with open('transition.txt', 'a') as file:
+        with open('local_obstacles.txt', 'a') as file:
         # Write "resume" followed by a newline character
             file.write("resume\n")
     
