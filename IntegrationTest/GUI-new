@@ -2,6 +2,7 @@ from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup, QTextEdit
 from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor, QImage
 from PyQt5.QtCore import QThread, pyqtSignal, QProcess, QTimer, QRect, Qt
+import numpy as np
 import sys
 import math
 import subprocess
@@ -13,6 +14,7 @@ font_title = QFont('Athelas', 16)
 font_title.setBold(True)
 
 font_button = QFont('Athelas', 12)
+font_dashboard = QFont('Athelas', 12)
 
 class BackendWorker(QThread):
     result_ready = pyqtSignal(str)
@@ -48,12 +50,13 @@ class Map(QWidget):
     local_obstacle_point_click_enabled = False
 
 
-
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setStyleSheet("background-color: white; border: 2px solid black; padding: 1px;")
         self.setGeometry(50, 80, 600, 600)
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
+        self.startpoint = []
+        self.endpoint = []
         self.background_image = None
 
         self.start_click_enabled.connect(self.enable_startpoint_click)
@@ -88,6 +91,8 @@ class Map(QWidget):
         if self.startpoint_click_enabled:
             # Save the coordinates to a file
             self.save_start_point_to_file(relative_x, relative_y)
+            self.startpoint.append((dot_relative_x, dot_relative_y))
+            self.update()
 
             # Disable further clicks on the map
             self.startpoint_click_enabled = False
@@ -95,6 +100,8 @@ class Map(QWidget):
         elif self.endpoint_click_enabled:
             # Save the coordinates to a file
             self.save_end_point_to_file(relative_x, relative_y)
+            self.endpoint.append((dot_relative_x, dot_relative_y))
+            self.update()
 
             # Disable further clicks on the map
             self.endpoint_click_enabled = False
@@ -123,8 +130,7 @@ class Map(QWidget):
         print(f"End point saved to {filename}")
 
     def save_local_obstacle_to_file(self, relative_x, relative_y, filename='local_obstacles.txt'):
-        print('open file')
-        with open(filename, 'w') as file:
+        with open(filename, 'a') as file:
             # Write the inputs to the file, each on a new line
             file.write(f"[{relative_x}, {relative_y}]\n")
         print(f"Data saved to {filename}")
@@ -153,6 +159,17 @@ class Map(QWidget):
         map_height = self.height()
 
         painter.setBrush(QBrush(QColor(0, 0, 0)))  # Black color for the dots
+
+        for relative_x, relative_y in self.startpoint:
+            x = int(relative_x * map_width)
+            y = int(relative_y * map_height)
+            painter.drawText(x - 5, y - 5, 'Start')
+        
+        for relative_x, relative_y in self.endpoint:
+            x = int(relative_x * map_width)
+            y = int(relative_y * map_height)
+            painter.drawText(x - 5, y - 5, 'End')
+        
         for relative_x, relative_y in self.dots:
             # Convert relative positions back to absolute positions based on the current size
             x = int(relative_x * map_width)
@@ -168,6 +185,13 @@ class Joystick(QWidget):
         self.joystick_position = [100, 100]  # Starting position of the joystick (center of the widget)
         self.circle_radius = 100  # Radius of the circular joystick area
         self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)  # Size of the joystick area (diameter)
+
+    def updateJoystickProperties(self, new_circle_radius, new_joystick_radius):
+        self.circle_radius = new_circle_radius
+        self.joystick_radius = new_joystick_radius
+        self.joystick_position = [self.circle_radius, self.circle_radius]
+        self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)
+        self.update()  
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -279,12 +303,12 @@ class MainWindow(QMainWindow):
         # Command buttons
         self.btn_resume = QtWidgets.QPushButton("Resume", self.central_widget)
         self.btn_resume.setFont(font_button)
-        # self.btn_resume.move(700, 80)
+        self.btn_resume.move(700, 80)
         self.btn_resume.clicked.connect(self.resume)
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
-        # self.btn_pause.move(820, 80)
+        self.btn_pause.move(820, 80)
         self.btn_pause.clicked.connect(self.pause)
 
         self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
@@ -309,7 +333,11 @@ class MainWindow(QMainWindow):
 
         # Map selection
         self.map_select = QComboBox(self)
-        # self.map_select.setGeometry(1000, 70, 150, 30)
+        self.map_select.setGeometry(980, 70, 150, 30)
+
+        self.label_map_select = QLabel("Map Select:", self)
+        self.label_map_select.setFont(font_title)
+        self.label_map_select.setGeometry(980, 40, 150, 20)
 
         self.map_select.addItem("Select")
         self.map_select.addItem("Map 1")
@@ -382,27 +410,18 @@ class MainWindow(QMainWindow):
         # Map
         self.map = Map(self.central_widget)
 
-        # Buttons for additional windows
-        self.btn_dashboard = QtWidgets.QPushButton("Dashboard", self.central_widget)
-        self.btn_dashboard.setFont(font_button)
-        self.btn_dashboard.move(700, 400)
 
-        self.btn_notification = QtWidgets.QPushButton("Notification", self.central_widget)
-        self.btn_notification.setFont(font_button)
-        self.btn_notification.move(800, 400)
-
-        #Button to start reading sensor data
-        self.btn_sensor_data = QtWidgets.QPushButton("Sensor data", self.central_widget)
-        self.btn_sensor_data.setFont(font_button)
-        self.btn_sensor_data.move(930, 400)
-        self.btn_sensor_data.clicked.connect(self.open_sensor_data_window)  # Connect the button click
-
+        self.label_sensor_data = QLabel(self.central_widget)
+        self.label_sensor_data.setText("Dashboard")
+        self.label_sensor_data.setFont(font_title)
+        self.label_sensor_data.adjustSize()
+        self.label_sensor_data.move(700, 400)
         #Sensor Data Window (Hidden Initially)
         self.sensor_data_window = QWidget(self)
         self.sensor_data_window.setStyleSheet("background-color: white; border: 1px solid black;")
         self.sensor_data_window.setGeometry(700, 430, 450, 220)
         self.sensor_data_label = QLabel("Sensor Data")
-
+        self.sensor_data_window.show()
         # QTextEdit for displaying sensor data
         self.sensor_data_text_edit = QTextEdit(self.sensor_data_window)
         self.sensor_data_text_edit.setGeometry(10,10,430,200)
@@ -412,28 +431,6 @@ class MainWindow(QMainWindow):
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_sensor_data)
 
-        # Create unique windows for each button
-        self.dashboard_window = QWidget(self)
-        self.dashboard_window.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.dashboard_window.setGeometry(700, 430, 450, 220)
-        self.dashboard_label = QLabel("Dashboard", self.dashboard_window)
-        self.dashboard_label.move(10, 10)
-
-        self.notification_window = QWidget(self)
-        self.notification_window.setStyleSheet("background-color: white; border: 1px solid black;")
-        self.notification_window.setGeometry(700, 430, 450, 220)
-        self.notification_label = QLabel("Notifications", self.notification_window)
-        self.notification_label.move(10, 10)
-
-        # Initially hide all the windows
-        self.notification_window.hide()
-        self.sensor_data_window.hide()
-
-        # Connect button clicks to show the corresponding window
-        self.btn_dashboard.clicked.connect(lambda: self.show_window(self.dashboard_window))
-        self.btn_notification.clicked.connect(lambda: self.show_window(self.notification_window))
-        self.btn_sensor_data.clicked.connect(lambda: self.show_window(self.sensor_data_window))
-        
         # QLabel to display the map image (initialize it here)
         self.map_image = QLabel(self.central_widget)
         self.map_image.setGeometry(50, 80, 600, 600)
@@ -455,15 +452,6 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_image)  # Call update_image every timeout
         
         self.paused = False
-
-    def show_window(self, window):
-        self.dashboard_window.hide()
-        self.notification_window.hide()
-        # Show the selected window
-        window.show()
-
-    #Show sensor data
-    def open_sensor_data_window(self):
         self.sensor_data_window.show()  # Show the sensor data window
         self.sensor_data_text_edit.clear()  # Clear previous content
         self.update_sensor_data()  # Start the first reading
@@ -559,6 +547,15 @@ class MainWindow(QMainWindow):
     def show_customize_widget(self):
         self.customize_widget.show()
         self.customize_widget.raise_()
+    
+    def resizeJoystick(self, scale_x, scale_y):
+        # Set the new radius for the joystick area and the movable joystick
+        new_circle_radius = int(100 * scale_x)  # or however you want it to scale
+        new_joystick_radius = int(25 * scale_x)
+
+        # Update the joystick properties and move it
+        self.joystick.updateJoystickProperties(new_circle_radius, new_joystick_radius)
+        self.joystick.setGeometry(int(700 * scale_x), int(160 * scale_y), new_circle_radius * 2, new_circle_radius * 2)
 
     def resizeEvent(self, event):
         new_width = self.width()
@@ -575,17 +572,16 @@ class MainWindow(QMainWindow):
         self.btn_pause.move(int(820 * scale_x), int(80 * scale_y))
         self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
         self.btn_start.move(int(820 * scale_x), int(110 * scale_y))
-        self.joystick.move(int(700 * scale_x), int(160 * scale_y))
+        self.resizeJoystick(scale_x, scale_y)
+
         self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
         self.btn_startpoint.setGeometry(int(980 * scale_x), int(330 * scale_y), int(170 * scale_x), int(25 * scale_y))
         self.btn_endpoint.setGeometry(int(980 * scale_x), int(360 * scale_y), int(170 * scale_x), int(25 * scale_y))
         self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
-
-        self.btn_dashboard.move(int(700 * scale_x), int(400 * scale_y))
-        self.btn_notification.move(int(800 * scale_x), int(400 * scale_y))
-        self.btn_sensor_data.move(int(930 * scale_x), int(400 * scale_y))
-
-        self.map_select.setGeometry(int(980 * scale_x), int(80 * scale_y), int(170 * scale_x), int(30 * scale_y))
+        self.map_select.setGeometry(int(980 * scale_x), int(70 * scale_y), int(150 * scale_x), int(30 * scale_y))
+        self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
+        # In your resizeEvent method, add the following for label_map_select
+        self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
 
         self.label_shipsize.move(int(980 * scale_x), int(120 * scale_y))
         self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(170 * scale_x), int(30 * scale_y))
@@ -606,10 +602,10 @@ class MainWindow(QMainWindow):
         self.customize_widget.clear_all.setGeometry(int(135*scale_x), int(250*scale_y), int(200*scale_x), int(40*scale_y))
         
         # Adjust window size
-        for window in [self.dashboard_window, self.notification_window, self.sensor_data_window]:
-            window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
-      
-      
+        self.sensor_data_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(220 * scale_y))
+        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(430 * scale_x), int(200 * scale_y))
+
+
     def load_images(self):
         figs_folder = 'figs'  # Change this to your actual path
         self.image_list = sorted([os.path.join(figs_folder, img) for img in os.listdir(figs_folder) 
@@ -705,7 +701,7 @@ class MainWindow(QMainWindow):
         else:
             # No images in the list initially, stop the timer
             self.timer.stop()
-        
+    
     def resume(self):
         if self.paused:
             self.paused = False  # Resume if paused
