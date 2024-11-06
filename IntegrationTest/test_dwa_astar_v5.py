@@ -14,7 +14,7 @@ sys.path.append(rpath)
 
 #from PathPlanning.AStar import a_star
 #from PathPlanning.DynamicWindowApproach import dwa_paper_with_width as dwa
-import dynamic_window_approach_paper as dwa
+import dwa_paper_with_width as dwa
 import a_star as a_star
 #import a_star_v2 as a_star
 
