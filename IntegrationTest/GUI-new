@@ -176,63 +176,63 @@ class Map(QWidget):
             y = int(relative_y * map_height)
             painter.drawEllipse(x - 5, y - 5, 10, 10)
 
-class Joystick(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
+# class Joystick(QWidget):
+#     def __init__(self, parent=None):
+#         super().__init__(parent)
 
-        # Set joystick properties
-        self.joystick_radius = 25
-        self.joystick_position = [100, 100]  # Starting position of the joystick (center of the widget)
-        self.circle_radius = 100  # Radius of the circular joystick area
-        self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)  # Size of the joystick area (diameter)
+#         # Set joystick properties
+#         self.joystick_radius = 25
+#         self.joystick_position = [100, 100]  # Starting position of the joystick (center of the widget)
+#         self.circle_radius = 100  # Radius of the circular joystick area
+#         self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)  # Size of the joystick area (diameter)
 
-    def updateJoystickProperties(self, new_circle_radius, new_joystick_radius):
-        self.circle_radius = new_circle_radius
-        self.joystick_radius = new_joystick_radius
-        self.joystick_position = [self.circle_radius, self.circle_radius]
-        self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)
-        self.update()  
+#     def updateJoystickProperties(self, new_circle_radius, new_joystick_radius):
+#         self.circle_radius = new_circle_radius
+#         self.joystick_radius = new_joystick_radius
+#         self.joystick_position = [self.circle_radius, self.circle_radius]
+#         self.setFixedSize(self.circle_radius * 2, self.circle_radius * 2)
+#         self.update()  
 
-    def paintEvent(self, event):
-        painter = QtGui.QPainter(self)
-        painter.setRenderHint(QtGui.QPainter.Antialiasing)
+#     def paintEvent(self, event):
+#         painter = QtGui.QPainter(self)
+#         painter.setRenderHint(QtGui.QPainter.Antialiasing)
 
-        # Draw circular background (joystick area)
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(220, 220, 220)))
-        painter.drawEllipse(0, 0, self.circle_radius * 2, self.circle_radius * 2)
+#         # Draw circular background (joystick area)
+#         painter.setBrush(QtGui.QBrush(QtGui.QColor(220, 220, 220)))
+#         painter.drawEllipse(0, 0, self.circle_radius * 2, self.circle_radius * 2)
 
-        # Draw the joystick (movable circle) with integer values
-        painter.setBrush(QtGui.QBrush(QtGui.QColor(50, 50, 250)))
-        painter.drawEllipse(int(self.joystick_position[0] - self.joystick_radius),
-                            int(self.joystick_position[1] - self.joystick_radius),
-                            int(self.joystick_radius * 2),
-                            int(self.joystick_radius * 2))
+#         # Draw the joystick (movable circle) with integer values
+#         painter.setBrush(QtGui.QBrush(QtGui.QColor(50, 50, 250)))
+#         painter.drawEllipse(int(self.joystick_position[0] - self.joystick_radius),
+#                             int(self.joystick_position[1] - self.joystick_radius),
+#                             int(self.joystick_radius * 2),
+#                             int(self.joystick_radius * 2))
 
-    def mouseMoveEvent(self, event):
-        # Get the current mouse position relative to the widget
-        x = event.x()
-        y = event.y()
+#     def mouseMoveEvent(self, event):
+#         # Get the current mouse position relative to the widget
+#         x = event.x()
+#         y = event.y()
 
-        # Calculate the distance from the center of the circle (circle_radius, circle_radius)
-        distance = math.sqrt((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2)
+#         # Calculate the distance from the center of the circle (circle_radius, circle_radius)
+#         distance = math.sqrt((x - self.circle_radius) ** 2 + (y - self.circle_radius) ** 2)
 
-        # If the distance is within the circle radius, update the joystick position
-        if distance <= self.circle_radius - self.joystick_radius:
-            self.joystick_position = [x, y]
-        else:
-            # Restrict movement to the edge of the circle
-            angle = math.atan2(y - self.circle_radius, x - self.circle_radius)
-            self.joystick_position = [
-                self.circle_radius + (self.circle_radius - self.joystick_radius) * math.cos(angle),
-                self.circle_radius + (self.circle_radius - self.joystick_radius) * math.sin(angle)
-            ]
+#         # If the distance is within the circle radius, update the joystick position
+#         if distance <= self.circle_radius - self.joystick_radius:
+#             self.joystick_position = [x, y]
+#         else:
+#             # Restrict movement to the edge of the circle
+#             angle = math.atan2(y - self.circle_radius, x - self.circle_radius)
+#             self.joystick_position = [
+#                 self.circle_radius + (self.circle_radius - self.joystick_radius) * math.cos(angle),
+#                 self.circle_radius + (self.circle_radius - self.joystick_radius) * math.sin(angle)
+#             ]
 
-        self.update()  # Trigger paintEvent to redraw the joystick
+#         self.update()  # Trigger paintEvent to redraw the joystick
 
-    def mouseReleaseEvent(self, event):
-        # Return the joystick to the center when the mouse is released
-        self.joystick_position = [self.circle_radius, self.circle_radius]
-        self.update()
+#     def mouseReleaseEvent(self, event):
+#         # Return the joystick to the center when the mouse is released
+#         self.joystick_position = [self.circle_radius, self.circle_radius]
+#         self.update()
 
 
 class CustomizeWidget(QWidget):
@@ -320,9 +320,9 @@ class MainWindow(QMainWindow):
         self.btn_start.move(820, 110)
         self.btn_start.clicked.connect(self.start)
 
-        # Joystick
-        self.joystick = Joystick(self.central_widget)
-        self.joystick.move(700, 160)
+        # # Joystick
+        # self.joystick = Joystick(self.central_widget)
+        # self.joystick.move(700, 160)
 
         #Map label
         self.label_map = QLabel(self.central_widget)
@@ -436,7 +436,6 @@ class MainWindow(QMainWindow):
         self.map_image.setGeometry(50, 80, 600, 600)
         self.map_image.setStyleSheet("border: 1px solid black;")
         self.map_image.setScaledContents(True)  # To make the image scale properly
-        self.map_image.hide() #Testing!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
         # Customize widget (hidden by default)
         self.customize_widget = CustomizeWidget(self.central_widget)
@@ -548,14 +547,14 @@ class MainWindow(QMainWindow):
         self.customize_widget.show()
         self.customize_widget.raise_()
     
-    def resizeJoystick(self, scale_x, scale_y):
-        # Set the new radius for the joystick area and the movable joystick
-        new_circle_radius = int(100 * scale_x)  # or however you want it to scale
-        new_joystick_radius = int(25 * scale_x)
+    # def resizeJoystick(self, scale_x, scale_y):
+    #     # Set the new radius for the joystick area and the movable joystick
+    #     new_circle_radius = int(100 * scale_x)  # or however you want it to scale
+    #     new_joystick_radius = int(25 * scale_x)
 
-        # Update the joystick properties and move it
-        self.joystick.updateJoystickProperties(new_circle_radius, new_joystick_radius)
-        self.joystick.setGeometry(int(700 * scale_x), int(160 * scale_y), new_circle_radius * 2, new_circle_radius * 2)
+    #     # Update the joystick properties and move it
+    #     self.joystick.updateJoystickProperties(new_circle_radius, new_joystick_radius)
+    #     self.joystick.setGeometry(int(700 * scale_x), int(160 * scale_y), new_circle_radius * 2, new_circle_radius * 2)
 
     def resizeEvent(self, event):
         new_width = self.width()
@@ -572,13 +571,13 @@ class MainWindow(QMainWindow):
         self.btn_pause.move(int(820 * scale_x), int(80 * scale_y))
         self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
         self.btn_start.move(int(820 * scale_x), int(110 * scale_y))
-        self.resizeJoystick(scale_x, scale_y)
+        # self.resizeJoystick(scale_x, scale_y)
 
-        self.label_locate.move(int(980 * scale_x), int(300 * scale_y))
-        self.btn_startpoint.setGeometry(int(980 * scale_x), int(330 * scale_y), int(170 * scale_x), int(25 * scale_y))
-        self.btn_endpoint.setGeometry(int(980 * scale_x), int(360 * scale_y), int(170 * scale_x), int(25 * scale_y))
+        self.label_locate.move(int(980 * scale_x), int(250 * scale_y))
+        self.btn_startpoint.setGeometry(int(980 * scale_x), int(280 * scale_y), int(170 * scale_x), int(25 * scale_y))
+        self.btn_endpoint.setGeometry(int(980 * scale_x), int(310 * scale_y), int(170 * scale_x), int(25 * scale_y))
         self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
-        self.map_select.setGeometry(int(980 * scale_x), int(70 * scale_y), int(150 * scale_x), int(30 * scale_y))
+        self.map_select.setGeometry(int(980 * scale_x), int(80 * scale_y), int(170 * scale_x), int(30 * scale_y))
         self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
         # In your resizeEvent method, add the following for label_map_select
         self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
@@ -591,7 +590,7 @@ class MainWindow(QMainWindow):
         self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(110 * scale_x), int(25 * scale_y))
         self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(110 * scale_x), int(25 * scale_y))
         self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.btn_setship.setGeometry(int(980 * scale_x), int(250 * scale_y), int(170 * scale_x), int(25 * scale_y))
+        self.btn_setship.setGeometry(int(980 * scale_x), int(360 * scale_y), int(170 * scale_x), int(25 * scale_y))
 
         #scaling for customize widget window
         self.customize_widget.setGeometry(int(700*scale_x), int(30*scale_y), int(450*scale_x), int(350*scale_y))
