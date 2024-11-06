@@ -436,6 +436,7 @@ class MainWindow(QMainWindow):
         self.map_image.setGeometry(50, 80, 600, 600)
         self.map_image.setStyleSheet("border: 1px solid black;")
         self.map_image.setScaledContents(True)  # To make the image scale properly
+        self.map_image.hide()
 
         # Customize widget (hidden by default)
         self.customize_widget = CustomizeWidget(self.central_widget)
