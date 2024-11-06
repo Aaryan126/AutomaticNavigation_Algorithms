@@ -10,12 +10,11 @@ import os
 import time
 import re
 
-font_title = QFont('Athelas', 16)
+font_title = QFont('Arial', 20)
 font_title.setBold(True)
 
-font_button = QFont('Athelas', 12)
-font_dashboard = QFont('Athelas', 12)
-
+font_button = QFont('Arial', 14)
+font_dashboard = QFont('Arial', 14)
 class RedirectedOutput: 
     def __init__(self, text_edit):
         self.text_edit = text_edit
@@ -26,7 +25,6 @@ class RedirectedOutput:
 
     def flush(self):
         pass  # Flush method can be empty for this purpose
-
 class BackendWorker(QThread):
     result_ready = pyqtSignal(str)
 
@@ -63,7 +61,7 @@ class Map(QWidget):
 
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setStyleSheet("background-color: white; border: 2px solid black; padding: 1px;")
+        self.setStyleSheet("color: lightblue; border: 2px solid black; padding: 1px;")
         self.setGeometry(50, 80, 600, 600)
         self.dots = []  # List to store dots as relative positions (percentage of the width and height)
         self.startpoint = []
@@ -297,6 +295,7 @@ class MainWindow(QMainWindow):
         # Set up the main window properties
         self.setWindowTitle("Navigation System")
         self.setGeometry(400, 200, 1200, 700)
+        self.setStyleSheet("background-color: #2C3E50;")
 
         self.original_width = 1200
         self.original_height = 700
@@ -307,6 +306,7 @@ class MainWindow(QMainWindow):
         # Command Label
         self.label_command = QLabel(self.central_widget)
         self.label_command.setText("Command:")
+        self.label_command.setStyleSheet("color: #FFFFFF;")
         self.label_command.setFont(font_title)
         self.label_command.adjustSize()
         self.label_command.move(700, 30)
@@ -314,23 +314,107 @@ class MainWindow(QMainWindow):
         # Command buttons
         self.btn_resume = QtWidgets.QPushButton("Resume", self.central_widget)
         self.btn_resume.setFont(font_button)
+        self.btn_resume.setStyleSheet("""
+            QPushButton {
+                background-color: #5A85A9;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #5A85A9;  /* Same color as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B1CFEB;  /* Light pastel blue when hovered */
+                border: 2px solid #B1CFEB;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #4B6C7A;  /* Darker blue when pressed */
+                border: 2px solid #4B6C7A;  /* Darker border when pressed */
+            }
+        """)
         self.btn_resume.move(700, 80)
         self.btn_resume.clicked.connect(self.resume)
 
         self.btn_pause = QtWidgets.QPushButton("Pause", self.central_widget)
         self.btn_pause.setFont(font_button)
+        self.btn_pause.setStyleSheet("""
+            QPushButton {
+                background-color: #5A85A9;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #5A85A9;  /* Same color as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B1CFEB;  /* Light pastel blue when hovered */
+                border: 2px solid #B1CFEB;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #4B6C7A;  /* Darker blue when pressed */
+                border: 2px solid #4B6C7A;  /* Darker border when pressed */
+            }
+        """)
         self.btn_pause.move(820, 80)
         self.btn_pause.clicked.connect(self.pause)
 
         self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
         self.btn_manual.setFont(font_button)
+        self.btn_manual.setStyleSheet("""
+            QPushButton {
+                background-color: #5A85A9;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #5A85A9;  /* Same color as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B1CFEB;  /* Light pastel blue when hovered */
+                border: 2px solid #B1CFEB;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #4B6C7A;  /* Darker blue when pressed */
+                border: 2px solid #4B6C7A;  /* Darker border when pressed */
+            }
+        """)
         self.btn_manual.move(700, 110)
 
         self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
         self.btn_start.setFont(font_button)
+        self.btn_start.setStyleSheet("""
+            QPushButton {
+                background-color: #5A85A9;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #5A85A9;  /* Same color as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B1CFEB;  /* Light pastel blue when hovered */
+                border: 2px solid #B1CFEB;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #4B6C7A;  /* Darker blue when pressed */
+                border: 2px solid #4B6C7A;  /* Darker border when pressed */
+            }
+        """)
         self.btn_start.move(820, 110)
         self.btn_start.clicked.connect(self.start)
-
+    
         # # Joystick
         # self.joystick = Joystick(self.central_widget)
         # self.joystick.move(700, 160)
@@ -341,13 +425,50 @@ class MainWindow(QMainWindow):
         self.label_map.setFont(font_title)
         self.label_map.adjustSize()
         self.label_map.move(50, 30)
+        self.label_map.setStyleSheet("color: #FFFFFF;")
 
         # Map selection
         self.map_select = QComboBox(self)
         self.map_select.setGeometry(980, 70, 150, 30)
+        self.map_select.setStyleSheet("""
+            QComboBox {
+                background-color: #619196;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #619196;  /* Border same as background */
+                border-radius: 10px;        /* Rounded corners */
+                padding: 5px 10px;          /* Padding inside the combo box */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QComboBox:hover {
+                background-color: #A3BFD9;  /* Pastel light blue on hover */
+                border: 2px solid #A3BFD9;  /* Border matches hover color */
+            }
+
+            QComboBox:pressed {
+                background-color: #4C6D86;  /* Slightly darker blue when pressed */
+                border: 2px solid #4C6D86;  /* Darker border when pressed */
+            }
+
+            QComboBox QAbstractItemView {
+                background-color: #A3BFD9;  /* Light blue for dropdown */
+                color: white;               /* White text in dropdown */
+                border: 2px solid #5A85A9;  /* Border same as primary combo box color */
+                border-radius: 5px;         /* Rounded corners for dropdown */
+                selection-background-color: #4C6D86;  /* Darker blue when selecting */
+                selection-color: white;     /* White text on selection */
+            }
+
+            QComboBox QAbstractItemView::item:hover {
+                background-color: #A3BFD9;  /* Light blue on item hover */
+                border: none;
+            }
+        """)
 
         self.label_map_select = QLabel("Map Select:", self)
         self.label_map_select.setFont(font_title)
+        self.label_map_select.setStyleSheet("color: #FFFFFF;")
         self.label_map_select.setGeometry(980, 40, 150, 20)
 
         self.map_select.addItem("Select")
@@ -364,11 +485,47 @@ class MainWindow(QMainWindow):
         # Set ship size and shape
         self.label_shipsize = QLabel(self.central_widget)
         self.label_shipsize.setText("Ship size:")
+        self.label_shipsize.setStyleSheet("color: #FFFFFF;")
         self.label_shipsize.setFont(font_title)
         self.label_shipsize.adjustSize()
         self.label_shipsize.move(980, 120)
 
         self.ship_shape = QComboBox(self)
+        self.ship_shape.setStyleSheet("""
+            QComboBox {
+                background-color: #619196;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #619196;  /* Border same as background */
+                border-radius: 10px;        /* Rounded corners */
+                padding: 5px 10px;          /* Padding inside the combo box */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QComboBox:hover {
+                background-color: #A3BFD9;  /* Pastel light blue on hover */
+                border: 2px solid #A3BFD9;  /* Border matches hover color */
+            }
+
+            QComboBox:pressed {
+                background-color: #4C6D86;  /* Slightly darker blue when pressed */
+                border: 2px solid #4C6D86;  /* Darker border when pressed */
+            }
+
+            QComboBox QAbstractItemView {
+                background-color: #A3BFD9;  /* Light blue for dropdown */
+                color: white;               /* White text in dropdown */
+                border: 2px solid #5A85A9;  /* Border same as primary combo box color */
+                border-radius: 5px;         /* Rounded corners for dropdown */
+                selection-background-color: #4C6D86;  /* Darker blue when selecting */
+                selection-color: white;     /* White text on selection */
+            }
+
+            QComboBox QAbstractItemView::item:hover {
+                background-color: #A3BFD9;  /* Light blue on item hover */
+                border: none;
+            }
+        """)
         self.ship_shape.setGeometry(980, 155, 150, 30)
 
         self.ship_shape.addItem("Rectangle")
@@ -376,14 +533,66 @@ class MainWindow(QMainWindow):
 
         self.label_length = QLabel(self.central_widget)
         self.label_length.setText("Length:")
+        self.label_length.setFont(font_button)
+        self.label_length.setStyleSheet("color: #FFFFFF;")
         self.label_length.move(980, 190)
         self.length_input = QLineEdit(self.central_widget)
+        self.length_input.setStyleSheet("""
+            QLineEdit {
+                background-color: #FFFFFF;  /* White background */
+                color: #333333;             /* Dark grey text color */
+                border: 2px solid #D3D3D3;  /* Light grey border */
+                border-radius: 10px;        /* Rounded corners */
+                padding: 5px 10px;          /* Padding inside the text field */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QLineEdit:focus {
+                border: 2px solid #5A85A9;  /* Soft blue border on focus */
+                background-color: #f9f9f9;  /* Slightly off-white background on focus */
+            }
+
+            QLineEdit:hover {
+                border: 2px solid #A0A0A0;  /* Darker grey border on hover */
+            }
+
+            QLineEdit::placeholder {
+                color: #B0B0B0;             /* Light grey for placeholder text */
+            }
+        """)
         self.length_input.setGeometry(1040, 190, 100, 25)
 
         self.label_width = QLabel(self.central_widget)
         self.label_width.setText("Width:")
+        self.label_width.setFont(font_button)
+        self.label_width.setStyleSheet("color: #FFFFFF;")
         self.label_width.move(980, 220)
         self.width_input = QLineEdit(self.central_widget)
+        self.width_input.setStyleSheet("""
+            QLineEdit {
+                background-color: #FFFFFF;  /* White background */
+                color: #333333;             /* Dark grey text color */
+                border: 2px solid #D3D3D3;  /* Light grey border */
+                border-radius: 10px;        /* Rounded corners */
+                padding: 5px 10px;          /* Padding inside the text field */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QLineEdit:focus {
+                border: 2px solid #5A85A9;  /* Soft blue border on focus */
+                background-color: #f9f9f9;  /* Slightly off-white background on focus */
+            }
+
+            QLineEdit:hover {
+                border: 2px solid #A0A0A0;  /* Darker grey border on hover */
+            }
+
+            QLineEdit::placeholder {
+                color: #B0B0B0;             /* Light grey for placeholder text */
+            }
+        """)
         self.width_input.setGeometry(1040, 220, 100, 25)
 
         self.label_radius = QLabel(self.central_widget)
@@ -397,6 +606,27 @@ class MainWindow(QMainWindow):
 
         self.btn_setship = QtWidgets.QPushButton("Set", self.central_widget)
         self.btn_setship.setFont(font_button)
+        self.btn_setship.setStyleSheet("""
+            QPushButton {
+                background-color: #E5AAA4;  /* Soft peachy-pink background */
+                color: white;               /* White text color */
+                border: 2px solid #e5AAA4;  /* Border same as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B3D9D4;  /* Pastel mint green on hover */
+                border: 2px solid #B3D9D4;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #D9AFA0;  /* Muted darker peach when pressed */
+                border: 2px solid #D9AFA0;  /* Darker border when pressed */
+            }
+        """)
         self.btn_setship.move(980, 250)
         self.btn_setship.clicked.connect(self.set)
         #self.btn_setship.clicked.connect(self.on_set_clicked)
@@ -404,17 +634,60 @@ class MainWindow(QMainWindow):
         # Setting location
         self.label_locate = QLabel(self.central_widget)
         self.label_locate.setText("Locate:")
+        self.label_locate.setStyleSheet("color: #FFFFFF;")
         self.label_locate.setFont(font_title)
         self.label_locate.adjustSize()
         self.label_locate.move(980, 300)
 
         self.btn_startpoint = QtWidgets.QPushButton("Start Point", self.central_widget)
         self.btn_startpoint.setFont(font_button)
+        self.btn_startpoint.setStyleSheet("""
+            QPushButton {
+                background-color: #5A85A9;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #5A85A9;  /* Same color as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B1CFEB;  /* Light pastel blue when hovered */
+                border: 2px solid #B1CFEB;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #4B6C7A;  /* Darker blue when pressed */
+                border: 2px solid #4B6C7A;  /* Darker border when pressed */
+            }
+        """)
         self.btn_startpoint.move(980, 330)
         self.btn_startpoint.clicked.connect(self.on_start_clicked)
 
         self.btn_endpoint = QtWidgets.QPushButton("End Point", self.central_widget)
         self.btn_endpoint.setFont(font_button)
+        self.btn_endpoint.setStyleSheet("""
+            QPushButton {
+                background-color: #5A85A9;  /* Muted blue background */
+                color: white;               /* White text color */
+                border: 2px solid #5A85A9;  /* Same color as background */
+                border-radius: 15px;        /* Rounded corners */
+                padding: 10px 20px;         /* Padding inside button */
+                font-size: 16px;            /* Font size */
+                font-weight: bold;          /* Make text bold */
+            }
+
+            QPushButton:hover {
+                background-color: #B1CFEB;  /* Light pastel blue when hovered */
+                border: 2px solid #B1CFEB;  /* Border matches hover color */
+            }
+
+            QPushButton:pressed {
+                background-color: #4B6C7A;  /* Darker blue when pressed */
+                border: 2px solid #4B6C7A;  /* Darker border when pressed */
+            }
+        """)
         self.btn_endpoint.move(980, 360)
         self.btn_endpoint.clicked.connect(self.on_end_clicked)
 
@@ -424,6 +697,7 @@ class MainWindow(QMainWindow):
 
         self.label_sensor_data = QLabel(self.central_widget)
         self.label_sensor_data.setText("Dashboard")
+        self.label_sensor_data.setStyleSheet("color: #FFFFFF;")
         self.label_sensor_data.setFont(font_title)
         self.label_sensor_data.adjustSize()
         self.label_sensor_data.move(700, 160)
@@ -437,19 +711,19 @@ class MainWindow(QMainWindow):
         self.sensor_data_text_edit = QTextEdit(self.sensor_data_window)
         self.sensor_data_text_edit.setGeometry(10,10,230,165)
         self.sensor_data_text_edit.setReadOnly(True)
+        self.sensor_data_text_edit.setStyleSheet("""
+            QTextEdit {
+                font-family: "Arial", sans-serif;  /* Set the font family */
+                font-size: 16px;                   /* Set the font size */
+                font-weight: normal;               /* Set the font weight (e.g., normal, bold) */
+            }
+        """)
 
-        # Timer for updating sensor data
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.update_sensor_data)
-
-        # Set up QTextEdit widget for displaying output
         self.terminal_window = QTextEdit(self)
         self.terminal_window.setReadOnly(True)  # Make it read-only
-
         # Timer for updating sensor data
         self.timer = QTimer()
         self.timer.timeout.connect(self.update_sensor_data)
-
         #Terminal Window
         self.label_terminal = QLabel(self.central_widget)
         self.label_terminal.setText("Terminal")
@@ -602,17 +876,19 @@ class MainWindow(QMainWindow):
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
         self.label_map.move(int(50 * scale_x), int(30 * scale_y))
-        self.btn_resume.move(int(700 * scale_x), int(80 * scale_y))
-        self.btn_pause.move(int(820 * scale_x), int(80 * scale_y))
-        self.btn_manual.move(int(700 * scale_x), int(110 * scale_y))
-        self.btn_start.move(int(820 * scale_x), int(110 * scale_y))
+        self.btn_resume.setGeometry(int(700 * scale_x), int(80 * scale_y),int(120 * scale_x), int(40 * scale_y) )
+        self.btn_pause.setGeometry(int(821 * scale_x), int(80 * scale_y),int(120 * scale_x), int(40 * scale_y) )
+        self.btn_manual.setGeometry(int(700 * scale_x), int(121 * scale_y),int(120 * scale_x), int(40 * scale_y) )
+        self.btn_start.setGeometry(int(821 * scale_x), int(121 * scale_y),int(120 * scale_x), int(40 * scale_y) )
         # self.resizeJoystick(scale_x, scale_y)
 
         self.label_locate.move(int(980 * scale_x), int(250 * scale_y))
-        self.btn_startpoint.setGeometry(int(980 * scale_x), int(280 * scale_y), int(170 * scale_x), int(25 * scale_y))
-        self.btn_endpoint.setGeometry(int(980 * scale_x), int(310 * scale_y), int(170 * scale_x), int(25 * scale_y))
+        self.btn_startpoint.setGeometry(int(980 * scale_x), int(280 * scale_y), int(170 * scale_x), int(40 * scale_y))
+        self.btn_endpoint.setGeometry(int(980 * scale_x), int(321 * scale_y), int(170 * scale_x), int(40 * scale_y))
+        self.btn_setship.setGeometry(int(980 * scale_x), int(365 * scale_y), int(170 * scale_x), int(40 * scale_y))
         self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
         self.map_select.setGeometry(int(980 * scale_x), int(80 * scale_y), int(170 * scale_x), int(30 * scale_y))
+        self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
         # In your resizeEvent method, add the following for label_map_select
         self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
 
@@ -624,7 +900,7 @@ class MainWindow(QMainWindow):
         self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(110 * scale_x), int(25 * scale_y))
         self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(110 * scale_x), int(25 * scale_y))
         self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.btn_setship.setGeometry(int(980 * scale_x), int(360 * scale_y), int(170 * scale_x), int(25 * scale_y))
+       
 
         #scaling for customize widget window
         self.customize_widget.setGeometry(int(700*scale_x), int(30*scale_y), int(450*scale_x), int(350*scale_y))
@@ -640,6 +916,7 @@ class MainWindow(QMainWindow):
         self.label_sensor_data.move(int(700 * scale_x), int(160*scale_y))
         self.terminal_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
         self.label_terminal.move(int(700 * scale_x), int(395 * scale_y))
+
 
 
     def load_images(self):
@@ -780,7 +1057,7 @@ class MainWindow(QMainWindow):
         """Trigger the signal to allow map clicks."""
         print("End Point button clicked.")
         self.map.end_click_enabled.emit()  # Emit the signal to enable map clicks
-
+    
     def closeEvent(self, event): #Need merge
         # Reset sys.stdout when closing the window
         sys.stdout = sys.__stdout__
