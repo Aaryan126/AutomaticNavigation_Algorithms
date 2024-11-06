@@ -387,24 +387,24 @@ def write_data_to_file(filename, global_distance, local_distance, coordinates):
                     
 
 
-def plot_dist_to_goal(ax, x, dist_to_goal): # Gives the distance from the robot to the goal
-    """ Plot the distance to the goal on the given axes. """
-    # Remove previous distance annotations if they exist
-    for annotation in ax.texts:
-        annotation.remove()
+# def plot_dist_to_goal(ax, x, dist_to_goal): # Gives the distance from the robot to the goal
+#     """ Plot the distance to the goal on the given axes. """
+#     # Remove previous distance annotations if they exist
+#     for annotation in ax.texts:
+#         annotation.remove()
 
-    # Plot new distance annotation
-    ax.text( #Distance from local goal
-        x[0], x[1], f"Dist: {dist_to_goal:.2f}",
-        color='red', fontsize=8,
-        verticalalignment='bottom', horizontalalignment='right'
-    )
-    ax.text( #Distance from global goal
-    gx, gy, f"Dist: {global_dist_to_goal:.2f}",
-        color='green', fontsize=8,
-        verticalalignment='bottom', horizontalalignment='right'
-    )
-    global_dist_to_goal
+#     # Plot new distance annotation
+#     ax.text( #Distance from local goal
+#         x[0], x[1], f"Dist: {dist_to_goal:.2f}",
+#         color='red', fontsize=8,
+#         verticalalignment='bottom', horizontalalignment='right'
+#     )
+#     ax.text( #Distance from global goal
+#     gx, gy, f"Dist: {global_dist_to_goal:.2f}",
+#         color='green', fontsize=8,
+#         verticalalignment='bottom', horizontalalignment='right'
+#     )
+#     global_dist_to_goal
 
 
 
@@ -472,7 +472,7 @@ for i_goal, dwagoal in enumerate(road_map):
         #Write Local distance, Global Distance, and coordinates to txt file
         write_data_to_file("sensor_data.txt",global_dist_to_goal,dist_to_goal,current_coordinates)
                 
-        plot_dist_to_goal(plt.gca(), x, dist_to_goal) # -Aaryan
+        # plot_dist_to_goal(plt.gca(), x, dist_to_goal) # -Aaryan
         if i_goal == len(road_map) - 1:
             if dist_to_goal <= config.catch_goal_dist:
                 print("Goal!!")
