@@ -252,6 +252,15 @@ a_star_planner = a_star.AStarPlanner(
 )
 rx, ry = a_star_planner.planning(sx, sy, gx, gy)
 
+# Start- Wen Ci----------------------------------------------------------------------------------------------------------------------
+# To plot a line for global path
+rx = rx[1:-1]  # Remove the first and last element from rx
+ry = ry[1:-1]  # Remove the first and last element from ry
+
+# Combine the start coordinates, rx and ry, and goal coordinates
+x_all = [gx] + rx + [sx]  # Start, then all rx, and then goal
+y_all = [gy] + ry + [sy]  # Start, then all ry, and then goal
+# End- Wen Ci------------------------------------------------------------------------------------------------------------------------
 
 road_map = np.array([rx, ry]).transpose()[::-1]
 # print(road_map)
@@ -260,6 +269,7 @@ road_map = np.array([rx, ry]).transpose()[::-1]
 if show_animation:  # pragma: no cover
     # plt.plot(rx, ry, "-r")
     plt.plot(rx, ry, "xb")
+    plt.plot(x_all, y_all, "b-")
     #plt.pause(0.1)
     plt.pause(0.001)
     
@@ -371,8 +381,8 @@ trajectory = np.array(x)
 #Function to write the loca distances, global distances and coordinates to text file
 def write_data_to_file(filename, global_distance, local_distance, coordinates):
     with open(filename, "w") as file:
-        file.write(f"Global Distance to Goal: {global_distance:.2f}\n")
-        file.write(f"Local Distance to Goal: {local_distance:.2f}\n")
+        file.write(f"Distance to Global Goal: {global_distance:.2f}\n")
+        file.write(f"Distance to Local Goal: {local_distance:.2f}\n")
         file.write(f"X Coordinate: {float(coordinates[0])}\nY Coordinate: {float(coordinates[1])}\n")
                     
 
