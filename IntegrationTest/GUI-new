@@ -976,11 +976,16 @@ class MainWindow(QMainWindow):
 
                 # Load the image as QImage
                 image = QImage(image_path)
-
-                crop_top = 50
-                crop_bottom = 50
-                crop_left = 50
-                crop_right = 50
+                if self.map_select.currentText() == "NY" or self.map_select.currentText() == "SG":
+                    crop_top = 15
+                    crop_bottom = 15
+                    crop_left = 17
+                    crop_right = 17
+                else:
+                    crop_top = 50
+                    crop_bottom = 50
+                    crop_left = 50
+                    crop_right = 50
 
                 # Calculate new dimensions after cropping
                 original_width = image.width()
