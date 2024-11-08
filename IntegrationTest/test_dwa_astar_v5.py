@@ -328,7 +328,7 @@ def read_new_obstacles():
 # Update plot
 def update_plot_with_new_obstacles(new_obstacles):
     for (x, y) in new_obstacles:
-        circle = plt.Circle((x, y), config.obstacle_radius, color="k")
+        circle = plt.Circle((x, y), config.obstacle_radius, color="k", edgecolor="k")
         plt.gca().add_patch(circle)
     
     plt.draw()
