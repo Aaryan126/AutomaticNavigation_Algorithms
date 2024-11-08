@@ -314,30 +314,30 @@ class MainWindow(QMainWindow):
         self.btn_pause.move(820, 80)
         self.btn_pause.clicked.connect(self.pause)
 
-        self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
-        self.btn_manual.setFont(font_button)
-        self.btn_manual.setStyleSheet("""
-            QPushButton {
-                background-color: #5A85A9;  /* Muted blue background */
-                color: white;               /* White text color */
-                border: 2px solid #5A85A9;  /* Same color as background */
-                border-radius: 15px;        /* Rounded corners */
-                padding: 10px 20px;         /* Padding inside button */
-                font-size: 16px;            /* Font size */
-                font-weight: bold;          /* Make text bold */
-            }
+        # self.btn_manual = QtWidgets.QPushButton("Manual", self.central_widget)
+        # self.btn_manual.setFont(font_button)
+        # self.btn_manual.setStyleSheet("""
+        #     QPushButton {
+        #         background-color: #5A85A9;  /* Muted blue background */
+        #         color: white;               /* White text color */
+        #         border: 2px solid #5A85A9;  /* Same color as background */
+        #         border-radius: 15px;        /* Rounded corners */
+        #         padding: 10px 20px;         /* Padding inside button */
+        #         font-size: 16px;            /* Font size */
+        #         font-weight: bold;          /* Make text bold */
+        #     }
 
-            QPushButton:hover {
-                background-color: #B1CFEB;  /* Light pastel blue when hovered */
-                border: 2px solid #B1CFEB;  /* Border matches hover color */
-            }
+        #     QPushButton:hover {
+        #         background-color: #B1CFEB;  /* Light pastel blue when hovered */
+        #         border: 2px solid #B1CFEB;  /* Border matches hover color */
+        #     }
 
-            QPushButton:pressed {
-                background-color: #4B6C7A;  /* Darker blue when pressed */
-                border: 2px solid #4B6C7A;  /* Darker border when pressed */
-            }
-        """)
-        self.btn_manual.move(700, 110)
+        #     QPushButton:pressed {
+        #         background-color: #4B6C7A;  /* Darker blue when pressed */
+        #         border: 2px solid #4B6C7A;  /* Darker border when pressed */
+        #     }
+        # """)
+        # self.btn_manual.move(700, 110)
 
         self.btn_start = QtWidgets.QPushButton("Start", self.central_widget)
         self.btn_start.setFont(font_button)
@@ -678,6 +678,7 @@ class MainWindow(QMainWindow):
         self.label_terminal = QLabel(self.central_widget)
         self.label_terminal.setText("Terminal")
         self.label_terminal.setFont(font_title)
+        self.label_terminal.setStyleSheet("color: #FFFFFF;")
         self.label_terminal.adjustSize()
         self.label_terminal.move(700, 395)
 
@@ -817,30 +818,30 @@ class MainWindow(QMainWindow):
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
         self.label_map.move(int(50 * scale_x), int(30 * scale_y))
-        self.btn_resume.setGeometry(int(700 * scale_x), int(80 * scale_y),int(120 * scale_x), int(40 * scale_y) )
-        self.btn_pause.setGeometry(int(821 * scale_x), int(80 * scale_y),int(120 * scale_x), int(40 * scale_y) )
-        self.btn_manual.setGeometry(int(700 * scale_x), int(121 * scale_y),int(120 * scale_x), int(40 * scale_y) )
-        self.btn_start.setGeometry(int(821 * scale_x), int(121 * scale_y),int(120 * scale_x), int(40 * scale_y) )
+        self.btn_resume.setGeometry(int(700 * scale_x), int(68 * scale_y),int(82 * scale_x), int(40 * scale_y) )
+        self.btn_pause.setGeometry(int(784 * scale_x), int(68 * scale_y),int(82 * scale_x), int(40 * scale_y) )
+        # self.btn_manual.setGeometry(int(700 * scale_x), int(121 * scale_y),int(120 * scale_x), int(40 * scale_y) )
+        self.btn_start.setGeometry(int(868 * scale_x), int(68 * scale_y),int(82 * scale_x), int(40 * scale_y) )
         # self.resizeJoystick(scale_x, scale_y)
 
-        self.label_locate.move(int(980 * scale_x), int(250 * scale_y))
-        self.btn_startpoint.setGeometry(int(980 * scale_x), int(280 * scale_y), int(170 * scale_x), int(40 * scale_y))
-        self.btn_endpoint.setGeometry(int(980 * scale_x), int(321 * scale_y), int(170 * scale_x), int(40 * scale_y))
-        self.btn_setship.setGeometry(int(980 * scale_x), int(365 * scale_y), int(170 * scale_x), int(40 * scale_y))
-        self.map.setGeometry(int(50 * scale_x), int(80 * scale_y), int(600 * scale_x), int(600 * scale_y))
-        self.map_select.setGeometry(int(980 * scale_x), int(80 * scale_y), int(170 * scale_x), int(30 * scale_y))
+        self.label_locate.move(int(980 * scale_x), int(255 * scale_y))
+        self.btn_startpoint.setGeometry(int(980 * scale_x), int(293 * scale_y), int(170 * scale_x), int(40 * scale_y))
+        self.btn_endpoint.setGeometry(int(980 * scale_x), int(334 * scale_y), int(170 * scale_x), int(40 * scale_y))
+        self.btn_setship.setGeometry(int(980 * scale_x), int(378 * scale_y), int(170 * scale_x), int(40 * scale_y))
+        self.map.setGeometry(int(50 * scale_x), int(70 * scale_y), int(600 * scale_x), int(600 * scale_y))
+        self.map_select.setGeometry(int(980 * scale_x), int(68 * scale_y), int(170 * scale_x), int(30 * scale_y))
         self.label_sensor_data.move(int(700 * scale_x), int(395*scale_y))
         # In your resizeEvent method, add the following for label_map_select
         self.label_map_select.setGeometry(int(980 * scale_x), int(30 * scale_y), int(150 * scale_x), int(30 * scale_y))
 
-        self.label_shipsize.move(int(980 * scale_x), int(120 * scale_y))
-        self.ship_shape.setGeometry(int(980 * scale_x), int(155 * scale_y), int(170 * scale_x), int(30 * scale_y))
-        self.label_length.move(int(980 * scale_x), int(195 * scale_y))
-        self.label_width.move(int(980 * scale_x), int(225 * scale_y))
-        self.label_radius.move(int(980 * scale_x), int(205 * scale_y))
-        self.length_input.setGeometry(int(1040 * scale_x), int(190 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.width_input.setGeometry(int(1040 * scale_x), int(220 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.radius_input.setGeometry(int(1040 * scale_x), int(200 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.label_shipsize.move(int(980 * scale_x), int(114 * scale_y))
+        self.ship_shape.setGeometry(int(980 * scale_x), int(150 * scale_y), int(170 * scale_x), int(30 * scale_y))
+        self.label_length.move(int(980 * scale_x), int(190 * scale_y))
+        self.label_width.move(int(980 * scale_x), int(220 * scale_y))
+        self.label_radius.move(int(980 * scale_x), int(215 * scale_y))
+        self.length_input.setGeometry(int(1040 * scale_x), int(185 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.width_input.setGeometry(int(1040 * scale_x), int(215 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.radius_input.setGeometry(int(1040 * scale_x), int(195 * scale_y), int(110 * scale_x), int(25 * scale_y))
        
 
         #scaling for customize widget window
@@ -852,11 +853,11 @@ class MainWindow(QMainWindow):
         self.customize_widget.clear_all.setGeometry(int(135*scale_x), int(250*scale_y), int(200*scale_x), int(40*scale_y))
         
         # Adjust window size
-        self.sensor_data_window.setGeometry(int(700 * scale_x), int(195 * scale_y), int(250 * scale_x), int(185 * scale_y))
-        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(230 * scale_x), int(165 * scale_y))
-        self.label_sensor_data.move(int(700 * scale_x), int(160*scale_y))
-        self.terminal_window.setGeometry(int(700 * scale_x), int(430 * scale_y), int(450 * scale_x), int(250 * scale_y))
-        self.label_terminal.move(int(700 * scale_x), int(395 * scale_y))
+        self.sensor_data_window.setGeometry(int(700 * scale_x), int(166 * scale_y), int(250 * scale_x), int(206 * scale_y))
+        self.sensor_data_text_edit.setGeometry(int(10 * scale_x), int(10 * scale_y), int(230 * scale_x), int(186 * scale_y))
+        self.label_sensor_data.move(int(700 * scale_x), int(128*scale_y))
+        self.terminal_window.setGeometry(int(700 * scale_x), int(426 * scale_y), int(450 * scale_x), int(244 * scale_y))
+        self.label_terminal.move(int(700 * scale_x), int(388 * scale_y))
 
 
 
