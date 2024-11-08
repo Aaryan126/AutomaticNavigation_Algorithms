@@ -10,8 +10,12 @@ import os
 import time
 import re
 
+scx = 1
+scy = 1
 font_title = QFont('Arial', 20)
 font_title.setBold(True)
+#scale_x = 1
+#scale_y = 1
 
 font_button = QFont('Arial', 14)
 font_dashboard = QFont('Arial', 14)
@@ -85,21 +89,22 @@ class Map(QWidget):
     def enable_local_obstacle_click(self):
         self.local_obstacle_point_click_enabled = True
 
-    def mousePressEvent(self, event):
+    def mousePressEvent(self, event):    
         # Get the current size of the map
         map_width = self.width()
         map_height = self.height()
 
         # Calculate the relative position as a percentage of the map size
-        dot_relative_x = event.x() / map_width
-        dot_relative_y = event.y() / map_height
+        dot_relative_x = (event.x() / map_width)/scx
+        dot_relative_y = (event.y() / map_height)/scy
 
+        relative_x = (event.x()/10)/scx
+        relative_y = ((map_height - event.y())/10)/scy
         
-        relative_x = event.x()/10
-        relative_y = (map_height - event.y())/10
-        
-        print(relative_x)
-        print(relative_y)
+        print("x-coord", relative_x)
+        print("y-coord", relative_y)
+        print("scale_x", scx)
+        print("scale_y", scy)
 
         if self.startpoint_click_enabled:
             # Save the coordinates to a file
@@ -174,13 +179,13 @@ class Map(QWidget):
         painter.setBrush(QBrush(QColor(0, 0, 0)))  # Black color for the dots
 
         for relative_x, relative_y in self.startpoint:
-            x = int(relative_x * map_width)
-            y = int(relative_y * map_height)
-            painter.drawText(x - 5, y - 5, 'Start')
+            x = int(relative_x * map_width * scx)
+            y = int(relative_y * map_height * scy)
+            painter.drawText((x - 5), (y - 5), 'Start')
         
         for relative_x, relative_y in self.endpoint:
-            x = int(relative_x * map_width)
-            y = int(relative_y * map_height)
+            x = int(relative_x * map_width * scx)
+            y = int(relative_y * map_height * scy)
             painter.drawText(x - 5, y - 5, 'End')
         
         painter.setBrush(QBrush(QColor(0, 0, 0)))  # Black color for the filled circle
@@ -814,7 +819,11 @@ class MainWindow(QMainWindow):
         # Calculate scale factors
         scale_x = new_width / self.original_width
         scale_y = new_height / self.original_height
-
+        global scx
+        global scy
+        scx = scale_x
+        scy = scale_y
+        
         # Scale and move widgets proportionally
         self.label_command.move(int(700 * scale_x), int(30 * scale_y))
         self.label_map.move(int(50 * scale_x), int(30 * scale_y))
@@ -858,7 +867,7 @@ class MainWindow(QMainWindow):
         self.label_sensor_data.move(int(700 * scale_x), int(128*scale_y))
         self.terminal_window.setGeometry(int(700 * scale_x), int(426 * scale_y), int(450 * scale_x), int(244 * scale_y))
         self.label_terminal.move(int(700 * scale_x), int(388 * scale_y))
-
+        #return scx, scy
 
 
     def load_images(self):
