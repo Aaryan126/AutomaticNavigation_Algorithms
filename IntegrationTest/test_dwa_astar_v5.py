@@ -1,5 +1,4 @@
-import os, sys, shutil
-
+import os, sys, shutil, cv2
 #Removing 'figs'
 figs_dir = os.path.join(os.path.dirname(__file__), 'figs')
 
@@ -153,8 +152,6 @@ try:
         config.robot_radius = float(sys.argv[1])
         config.robot_dim = config.robot_radius
         selected_map = sys.argv[2]
-        
-    
     
 except ValueError:
     print("Error: All arguments must be numbers.")
@@ -179,11 +176,9 @@ try:
         #ob = np.array([ox, oy]).transpose()
 
         # Execute the map file contents, which appends values to ox and oy
-        exec(map_code)
-        
+        exec(map_code)        
         # # After executing, convert ox and oy into an obstacle array
         if (is_ob == 1):
-            
             print("Works!")
         else: 
             ob = np.array([ox, oy]).transpose()
@@ -197,37 +192,16 @@ except FileNotFoundError:
 except Exception as e:
     print(f"Error: Unable to execute the map file '{map_file}'. Reason: {str(e)}")
     sys.exit(1)
-# End -Aaryan
-# for i in range(60):
-#     ox.append(i)
-#     oy.append(0.0)
-# for i in range(60):
-#     ox.append(60.0)
-#     oy.append(i)
-# for i in range(61):
-#     ox.append(i)
-#     oy.append(60.0)
-# for i in range(61):
-#     ox.append(0.0)
-#     oy.append(i)
-# for i in range(40):
-#     ox.append(20.0)
-#     oy.append(i)
-# for i in range(40):
-#     ox.append(40.0)
-#     oy.append(60.0 - i)
-#ob = np.array([ox, oy]).transpose()
-
-# # Open the file containing code #Start -Aaryan
-# with open('map1.txt', 'r') as file:
-#     code = file.read()  # Read the entire file content
-
-# # Execute the code
-# exec(code) #End -Aaryan
 
 # Plot the map
 if show_animation:  # pragma: no cover
     plt.figure(figsize=(6, 6))
+    if(os.path.basename(map_file)=="NY.txt"):
+        background_img = cv2.imread("Images/NY.png", cv2.IMREAD_COLOR)  # Load as color image
+        plt.imshow(cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB), extent=[0, 60, 0, 60]) # Loading background image
+    elif(os.path.basename(map_file)=="SG.txt"):
+        background_img = cv2.imread("Images/SG.png", cv2.IMREAD_COLOR)  # Load as color image
+        plt.imshow(cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB), extent=[0, 60, 0, 60]) # Loading background image
     if save_animation_to_figs:
         cur_dir = os.path.dirname(__file__)
         fig_dir = os.path.join(cur_dir, 'figs')
@@ -237,8 +211,13 @@ if show_animation:  # pragma: no cover
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
     # plt.plot(ox, oy, ".k")
     for (x, y) in ob:
-        circle = plt.Circle((x, y), config.obstacle_radius, color="k") #Aaryan - changed config.robot_radius to config.obstacle_radius
-        plt.gca().add_patch(circle)
+        if(os.path.basename(map_file)!="NY.txt" and os.path.basename(map_file)!="SG.txt"):
+        #     circle = plt.Circle((x, y), config.obstacle_radius, color="black", alpha=0) #alpha = 0 makes the plots transparent
+        # elif(os.path.basename(map_file)=="SG.txt"):
+        #     circle = plt.Circle((x, y), config.obstacle_radius, color="black", alpha=0.5) #alpha = 0 makes the plots transparent
+        #else: 
+            circle = plt.Circle((x, y), config.obstacle_radius, color="k") #Aaryan - changed config.robot_radius to config.obstacle_radius
+            plt.gca().add_patch(circle)
     plt.plot(sx, sy, "og") #Start coord
     plt.plot(gx, gy, "*b") #Goal coord
     plt.grid(True)
