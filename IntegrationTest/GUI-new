@@ -19,6 +19,7 @@ font_title.setBold(True)
 
 font_button = QFont('Arial', 14)
 font_dashboard = QFont('Arial', 14)
+
 class RedirectedOutput: 
     def __init__(self, text_edit):
         self.text_edit = text_edit
@@ -29,6 +30,7 @@ class RedirectedOutput:
 
     def flush(self):
         pass  # Flush method can be empty for this purpose
+
 class BackendWorker(QThread):
     result_ready = pyqtSignal(str)
 
@@ -177,6 +179,7 @@ class Map(QWidget):
         map_height = self.height()
 
         painter.setBrush(QBrush(QColor(0, 0, 0)))  # Black color for the dots
+        painter.setPen(QColor(0, 0, 0))  # Set text color to black
 
         for relative_x, relative_y in self.startpoint:
             x = int(relative_x * map_width * scx)
@@ -188,7 +191,6 @@ class Map(QWidget):
             y = int(relative_y * map_height * scy)
             painter.drawText(x - 5, y - 5, 'End')
         
-        painter.setBrush(QBrush(QColor(0, 0, 0)))  # Black color for the filled circle
         painter.setPen(QColor(0, 0, 0, 0))  # Fully transparent pen
         #painter.setPen(QPen(QColor(255, 0, 0)))  # Red border (you can change the color)
         #painter.setPen(Qt.NoPen)  # Disable the pen to remove the border
@@ -687,7 +689,6 @@ class MainWindow(QMainWindow):
         self.label_terminal.adjustSize()
         self.label_terminal.move(700, 395)
 
-        self.terminal_window = QTextEdit(self)
         self.terminal_window.setReadOnly(True)  # Make it read-only
         self.terminal_window.setGeometry(700, 430, 450, 250) 
         self.terminal_window.setStyleSheet("background-color: white; border: 1px solid black;")
