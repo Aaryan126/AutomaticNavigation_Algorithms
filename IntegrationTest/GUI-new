@@ -1,3 +1,4 @@
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup, QTextEdit
 from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor, QImage
@@ -196,8 +197,8 @@ class Map(QWidget):
         #painter.setPen(Qt.NoPen)  # Disable the pen to remove the border
         for relative_x, relative_y in self.dots:
             # Convert relative positions back to absolute positions based on the current size
-            x = int(relative_x * map_width)
-            y = int(relative_y * map_height)
+            x = int(relative_x * map_width * scx)
+            y = int(relative_y * map_height * scy)
             painter.drawEllipse(x - 5, y - 5, 10, 10)
 
 
