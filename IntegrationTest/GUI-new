@@ -1,3 +1,4 @@
+
 from PyQt5 import QtWidgets, QtGui, QtCore
 from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QLabel, QComboBox, QPushButton, QLineEdit, QMessageBox, QRadioButton, QHBoxLayout, QButtonGroup, QTextEdit
 from PyQt5.QtGui import QFont, QPixmap, QPainter, QBrush, QColor, QImage
@@ -556,9 +557,9 @@ class MainWindow(QMainWindow):
         self.label_radius.setText("Radius:")
         self.label_radius.setFont(font_button)
         self.label_radius.setStyleSheet("color: #FFFFFF;")
-        self.label_radius.move(980, 190)
+        self.label_radius.move(980, 210)
         self.radius_input = QLineEdit(self.central_widget)
-        self.radius_input.setGeometry(1040, 190, 100, 25)
+        self.radius_input.setGeometry(1040, 210, 100, 25)
         self.radius_input.setStyleSheet("""
             QLineEdit {
                 background-color: #FFFFFF;  /* White background */
@@ -877,7 +878,7 @@ class MainWindow(QMainWindow):
         self.label_radius.move(int(980 * scale_x), int(215 * scale_y))
         self.length_input.setGeometry(int(1040 * scale_x), int(185 * scale_y), int(110 * scale_x), int(25 * scale_y))
         self.width_input.setGeometry(int(1040 * scale_x), int(215 * scale_y), int(110 * scale_x), int(25 * scale_y))
-        self.radius_input.setGeometry(int(1040 * scale_x), int(195 * scale_y), int(110 * scale_x), int(25 * scale_y))
+        self.radius_input.setGeometry(int(1040 * scale_x), int(210 * scale_y), int(110 * scale_x), int(25 * scale_y))
        
 
         #scaling for customize widget window
