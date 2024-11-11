@@ -193,15 +193,52 @@ except Exception as e:
     print(f"Error: Unable to execute the map file '{map_file}'. Reason: {str(e)}")
     sys.exit(1)
 
+#Set up dynamic obstacle coordinate
+ob1=[]
+map1_ob=[16,22]
+map2_ob=[8,39]
+map3_ob=[45,5]
+map4_ob=[35,58]
+map5_ob=[35,38]
+sg_ob=[57,25]
+ny_ob=[51,23]
+#Set up direction of ob
+ob_direction=[0.01,0.01]
+map1_ob_direction=[0.01,0.01]
+map2_ob_direction=[-0.01,0.01]
+map3_ob_direction=[-0.01,0]
+map4_ob_direction=[0,-0.01]
+map5_ob_direction=[0,-0.01]
+sg_ob_direction=[-0.01,0.01]
+ny_ob_direction=[-0.01,0.01] 
 # Plot the map
 if show_animation:  # pragma: no cover
     plt.figure(figsize=(6, 6))
     if(os.path.basename(map_file)=="NY.txt"):
         background_img = cv2.imread("Images/NY.png", cv2.IMREAD_COLOR)  # Load as color image
         plt.imshow(cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB), extent=[0, 60, 0, 60]) # Loading background image
+        ob1=ny_ob
+        ob_direction=ny_ob_direction
     elif(os.path.basename(map_file)=="SG.txt"):
         background_img = cv2.imread("Images/SG.png", cv2.IMREAD_COLOR)  # Load as color image
         plt.imshow(cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB), extent=[0, 60, 0, 60]) # Loading background image
+        ob1=sg_ob
+        ob_direction=sg_ob_direction
+    elif(os.path.basename(map_file)=="Map1.txt"):
+        ob1=map1_ob
+        ob_direction=map1_ob_direction
+    elif(os.path.basename(map_file)=="Map2.txt"):
+        ob1=map2_ob
+        ob_direction=map2_ob_direction
+    elif(os.path.basename(map_file)=="Map3.txt"):
+        ob1=map3_ob
+        ob_direction=map3_ob_direction
+    elif(os.path.basename(map_file)=="Map4.txt"):
+        ob1=map4_ob
+        ob_direction=map5_ob_direction
+    elif(os.path.basename(map_file)=="Map5.txt"):
+        ob1=map5_ob
+        ob_direction=map5_ob_direction
     if save_animation_to_figs:
         cur_dir = os.path.dirname(__file__)
         fig_dir = os.path.join(cur_dir, 'figs')
@@ -210,6 +247,8 @@ if show_animation:  # pragma: no cover
         i_fig = 0
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
     # plt.plot(ox, oy, ".k")
+    dynob = plt.Circle((ob1[0],ob1[1]), config.robot_radius, color="k")
+    plt.gca().add_patch(dynob)
     for (x, y) in ob:
         if(os.path.basename(map_file)!="NY.txt" and os.path.basename(map_file)!="SG.txt"):
         #     circle = plt.Circle((x, y), config.obstacle_radius, color="black", alpha=0) #alpha = 0 makes the plots transparent
@@ -434,12 +473,25 @@ for i_goal, dwagoal in enumerate(road_map):
             
             plt.grid(False)
 
-            if save_animation_to_figs:
-                plt.axis('off')
-                #plt.savefig(fig_path)
-                plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
-                i_fig += 1
-                fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
+            if ob1[0]>29 or ob1[1]<55:
+                ob1[0],ob1[1] =ob1[0]+ob_direction[0],ob1[1]+ob_direction[1]
+                plt_elements.append(plt.plot(ob1[0],ob1[1], "xr")[0])
+                plt.pause(0.001)
+                if save_animation_to_figs:
+                    plt.axis('off')
+                    #plt.savefig(fig_path)
+                    plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
+                    i_fig += 1
+                    fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
+
+
+            else:
+                if save_animation_to_figs:
+                    plt.axis('off')
+                    #plt.savefig(fig_path)
+                    plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
+                    i_fig += 1
+                    fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
         # check reaching goal
         dist_to_goal = math.hypot(x[0] - dwagoal[0], x[1] - dwagoal[1]) # Local Goal
