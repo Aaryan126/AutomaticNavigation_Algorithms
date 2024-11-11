@@ -11,6 +11,7 @@ See Wikipedia article (https://en.wikipedia.org/wiki/A*_search_algorithm)
 
 import math
 import sys
+import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -96,7 +97,7 @@ class AStarPlanner:
                                              lambda event: [exit(
                                                  0) if event.key == 'escape' else None])
                 if len(closed_set.keys()) % 10 == 0:
-                    plt.pause(0.001)
+                    time.sleep(0.001)
 
             if current.x == goal_node.x and current.y == goal_node.y:
                 print("Find goal")
@@ -308,7 +309,7 @@ def main():
 
     if show_animation:  # pragma: no cover
         plt.plot(rx, ry, "-r")
-        plt.pause(0.001)
+        time.sleep(0.001)
         plt.show()
 
 
