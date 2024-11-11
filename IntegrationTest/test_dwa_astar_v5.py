@@ -248,7 +248,7 @@ if show_animation:  # pragma: no cover
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
     # plt.plot(ox, oy, ".k")
     dynob = plt.Circle((ob1[0],ob1[1]), config.robot_radius, color="k")
-    plt.gca().add_patch(dynob)
+    #plt.gca().add_patch(dynob)
     for (x, y) in ob:
         if(os.path.basename(map_file)!="NY.txt" and os.path.basename(map_file)!="SG.txt"):
         #     circle = plt.Circle((x, y), config.obstacle_radius, color="black", alpha=0) #alpha = 0 makes the plots transparent
