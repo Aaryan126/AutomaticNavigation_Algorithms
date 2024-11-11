@@ -247,7 +247,7 @@ if show_animation:  # pragma: no cover
         i_fig = 0
         fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
     # plt.plot(ox, oy, ".k")
-    dynob = plt.Circle((ob1[0],ob1[1]), config.robot_radius, color="k")
+    #dynob = plt.Circle((ob1[0],ob1[1]), config.robot_radius, color="k")
     #plt.gca().add_patch(dynob)
     for (x, y) in ob:
         if(os.path.basename(map_file)!="NY.txt" and os.path.basename(map_file)!="SG.txt"):
