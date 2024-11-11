@@ -18,8 +18,8 @@ import a_star as a_star
 #import a_star_v2 as a_star
 
 # Removes socket error with PyQt5
-# import matplotlib
-# matplotlib.use('TkAgg')
+import matplotlib
+matplotlib.use('Agg')
 
 import math
 import numpy as np
@@ -280,7 +280,7 @@ x_all = [gx] + rx + [sx]  # Start, then all rx, and then goal
 y_all = [gy] + ry + [sy]  # Start, then all ry, and then goal
 # End- Wen Ci------------------------------------------------------------------------------------------------------------------------
 
-road_map = np.array([rx, ry]).transpose()[::-1]
+road_map = np.array([x_all, y_all]).transpose()[::-1]
 # print(road_map)
 
 # Plot the path
@@ -289,7 +289,7 @@ if show_animation:  # pragma: no cover
     plt.plot(rx, ry, "xb")
     plt.plot(x_all, y_all, "b-")
     #plt.pause(0.1)
-    plt.pause(0.001)
+    time.sleep(0.001)
     
     plt.grid(False)
 
@@ -380,7 +380,7 @@ while True:
         ob = np.vstack((ob, new_ob))  # Combine old and new obstacles
         update_plot_with_new_obstacles(new_ob)  # Plot the new obstacles
 
-    plt.pause(0.001)  # Allow time for the plot to refresh
+    time.sleep(0.001)  # Allow time for the plot to refresh
 
     if new_ob.size > 0:
         break
@@ -469,14 +469,14 @@ for i_goal, dwagoal in enumerate(road_map):
             plt_elements.extend(dwa.plot_arrow(x[0], x[1], x[2]))
             plt_elements.append(plt.plot(trajectory[:, 0], trajectory[:, 1], "-r")[0])
             #plt.pause(0.1)
-            plt.pause(0.001)
+            time.sleep(0.001)
             
             plt.grid(False)
 
             if ob1[0]>29 or ob1[1]<55:
                 ob1[0],ob1[1] =ob1[0]+ob_direction[0],ob1[1]+ob_direction[1]
                 plt_elements.append(plt.plot(ob1[0],ob1[1], "xr")[0])
-                plt.pause(0.001)
+                time.sleep(0.001)
                 if save_animation_to_figs:
                     plt.axis('off')
                     #plt.savefig(fig_path)
