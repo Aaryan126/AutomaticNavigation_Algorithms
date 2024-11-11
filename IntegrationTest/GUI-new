@@ -909,10 +909,10 @@ class MainWindow(QMainWindow):
             QTimer.singleShot(1000, self.start_image_update)   # Start the timer with a 1-second interval              
             
     def run_subprocess(self, command):
-        if os.name == 'nt':
-            startupinfo = subprocess.STARTUPINFO()
-            startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            self.process = subprocess.Popen(['python'] + command, startupinfo=startupinfo)
+        # if os.name == 'nt':
+            # startupinfo = subprocess.STARTUPINFO()
+            # startupinfo.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        self.process = subprocess.Popen(['python'] + command)
 
     def closeEvent(self, event):
         self.process.kill()
