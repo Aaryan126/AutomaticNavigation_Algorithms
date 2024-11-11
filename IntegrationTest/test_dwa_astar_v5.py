@@ -195,22 +195,32 @@ except Exception as e:
 
 #Set up dynamic obstacle coordinate
 ob1=[]
-map1_ob=[16,22]
-map2_ob=[8,39]
-map3_ob=[45,5]
-map4_ob=[35,58]
-map5_ob=[35,38]
+map1_ob=[160,420]
+map2_ob=[80,420]
+map3_ob=[430,120]
+map4_ob=[350,580]
+map5_ob=[350,380]
 sg_ob=[57,25]
-ny_ob=[51,23]
+ny_ob=[51,27]
 #Set up direction of ob
-ob_direction=[0.01,0.01]
-map1_ob_direction=[0.01,0.01]
-map2_ob_direction=[-0.01,0.01]
-map3_ob_direction=[-0.01,0]
-map4_ob_direction=[0,-0.01]
-map5_ob_direction=[0,-0.01]
-sg_ob_direction=[-0.01,0.01]
-ny_ob_direction=[-0.01,0.01] 
+speed=100
+ob_direction=[0.01*speed,0.01*speed]
+map1_ob_direction=[0*speed,-0.01*speed]
+map2_ob_direction=[0.01*speed,-0.01*speed]
+map3_ob_direction=[-0.01*speed,0*speed]
+map4_ob_direction=[0*speed,-0.01*speed]
+map5_ob_direction=[0*speed,-0.01*speed]
+sg_ob_direction=[-0.01*speed,0.01*speed]
+ny_ob_direction=[-0.01*speed,0.01*speed] 
+map1_ob_start,map1_ob_end=[160,10],[160,420]
+map2_ob_start,map2_ob_end=[80,10],[60,430]
+map3_ob_start,map3_ob_end=[10,100],[430,150]
+map4_ob_start,map4_ob_end=[340,10],[360,590]
+map5_ob_start,map5_ob_end=[340,10],[360,390]
+sg_ob_start,sg_ob_end=[28,25],[57,55]
+ny_ob_start,ny_ob_end=[28,20],[57,55]
+ob1_start,ob1_end=[0,0],[60,60]
+dyn=False
 # Plot the map
 if show_animation:  # pragma: no cover
     plt.figure(figsize=(6, 6))
@@ -218,27 +228,30 @@ if show_animation:  # pragma: no cover
         background_img = cv2.imread("Images/NY.png", cv2.IMREAD_COLOR)  # Load as color image
         plt.imshow(cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB), extent=[0, 60, 0, 60]) # Loading background image
         ob1=ny_ob
-        ob_direction=ny_ob_direction
+        ob_direction,ob1_start,ob1_end=ny_ob_direction,ny_ob_start,ny_ob_end
+        dyn=True
     elif(os.path.basename(map_file)=="SG.txt"):
         background_img = cv2.imread("Images/SG.png", cv2.IMREAD_COLOR)  # Load as color image
         plt.imshow(cv2.cvtColor(background_img, cv2.COLOR_BGR2RGB), extent=[0, 60, 0, 60]) # Loading background image
         ob1=sg_ob
-        ob_direction=sg_ob_direction
+        ob_direction,ob1_start,ob1_end=sg_ob_direction,sg_ob_start,sg_ob_end
+        dyn=True
     elif(os.path.basename(map_file)=="Map1.txt"):
         ob1=map1_ob
-        ob_direction=map1_ob_direction
+        ob_direction,ob1_start,ob1_end=map1_ob_direction,map1_ob_start,map1_ob_end
     elif(os.path.basename(map_file)=="Map2.txt"):
         ob1=map2_ob
-        ob_direction=map2_ob_direction
+        ob_direction,ob1_start,ob1_end=map2_ob_direction,map2_ob_start,map2_ob_end
     elif(os.path.basename(map_file)=="Map3.txt"):
         ob1=map3_ob
-        ob_direction=map3_ob_direction
+        ob_direction,ob1_start,ob1_end=map3_ob_direction,map3_ob_start,map3_ob_end
     elif(os.path.basename(map_file)=="Map4.txt"):
         ob1=map4_ob
-        ob_direction=map5_ob_direction
+        ob_direction,ob1_start,ob1_end=map4_ob_direction,map4_ob_start,map4_ob_end
     elif(os.path.basename(map_file)=="Map5.txt"):
         ob1=map5_ob
-        ob_direction=map5_ob_direction
+        ob_direction,ob1_start,ob1_end=map5_ob_direction,map5_ob_start,map5_ob_end
+
     if save_animation_to_figs:
         cur_dir = os.path.dirname(__file__)
         fig_dir = os.path.join(cur_dir, 'figs')
@@ -448,6 +461,13 @@ for i_goal, dwagoal in enumerate(road_map):
             skip_goal = True
             print(f"Skipping local goal {dwagoal} due to nearby obstacle at ({obstacle_x}, {obstacle_y})")
             break
+    if dyn==True:
+        dynobstacle_x, dynobstacle_y = ob1[0],ob1[1]
+        distance_to_obstacle = math.hypot(dwagoal[0] - dynobstacle_x, dwagoal[1] - dynobstacle_y)
+        if distance_to_obstacle < min_obstacle_localgoal_distance:
+            skip_goal = True
+            print(f"Skipping local goal {dwagoal} due to nearby dynamic obstacle at ({dynobstacle_x}, {dynobstacle_y})")
+            break
 
     if skip_goal:
         continue  # Skip to the next local goal
@@ -472,17 +492,23 @@ for i_goal, dwagoal in enumerate(road_map):
             time.sleep(0.001)
             
             plt.grid(False)
-
-            if ob1[0]>29 or ob1[1]<55:
-                ob1[0],ob1[1] =ob1[0]+ob_direction[0],ob1[1]+ob_direction[1]
-                plt_elements.append(plt.plot(ob1[0],ob1[1], "xr")[0])
-                time.sleep(0.001)
-                if save_animation_to_figs:
-                    plt.axis('off')
-                    #plt.savefig(fig_path)
-                    plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
-                    i_fig += 1
-                    fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
+            #setting ob1 start and end grid limit
+            #print(f"no corr clear") 
+            if dyn==True: 
+                if ob1_start[0]<=ob1[0]and ob1[0]<=ob1_end[0]:
+                    #print(f"x corr clear")
+                    if ob1_start[1]<=ob1[1] and ob1[1]<=ob1_end[1]:
+                        #print(f"y corr clear") 
+                        ob1[0],ob1[1] =ob1[0]+ob_direction[0],ob1[1]+ob_direction[1]
+                        print(ob1)
+                        plt_elements.append(plt.plot(ob1[0],ob1[1], "xr")[0])
+                        
+                    if save_animation_to_figs:
+                        plt.axis('off')
+                        #plt.savefig(fig_path)
+                        plt.savefig(fig_path, dpi=150, bbox_inches='tight',  pad_inches=0.1)
+                        i_fig += 1
+                        fig_path = os.path.join(fig_dir, 'frame_{}.png'.format(i_fig))
 
 
             else:
