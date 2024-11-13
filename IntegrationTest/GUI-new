@@ -173,7 +173,7 @@ class Map(QWidget):
             painter.drawRect(0, 0, self.width(), self.height())
             painter.setPen(QColor(150, 150, 150))  # Gray color for the text
             painter.setFont(QFont("Arial", 16))
-            painter.drawText(self.rect(), QtCore.Qt.AlignCenter, "Please select a map")
+            painter.drawText(self.rect(), QtCore.Qt.AlignCenter, "Please select a map and refer to the terminal for instructions.")
 
         # Recalculate the dots' positions based on the current size of the map
         map_width = self.width()
@@ -758,6 +758,16 @@ class MainWindow(QMainWindow):
             if not os.path.exists('sensor_data.txt'):
                 self.sensor_data_text_edit.setPlainText("Sensor Data: The file does not exist.")
                 print("The file does not exist.")
+                print("Usage Instructions")
+                print("Step 1: Please select a map.")
+                print("Step 2: Please select the shape of the ship.")
+                print("Step 3: Please select the ship's dimensions. ")
+                print("Step 4: Please select a start point and end point.")
+                print("Step 5: Once you are done with your selection, press set.")
+                print("Step 6: Press the scroll button to plot local obstacles. ")
+                print("Step 7: Press start to run the program.")
+                print("Step 8: Press pause to pause the program.")
+                print("Step 9: Press resume to continue running the program.")
                 return
             
             with open('sensor_data.txt', 'r') as file:
