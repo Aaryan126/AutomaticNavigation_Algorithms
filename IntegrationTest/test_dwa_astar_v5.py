@@ -203,7 +203,7 @@ map5_ob=[350,380]
 sg_ob=[57,25]
 ny_ob=[51,27]
 #Set up direction of ob
-speed=100
+speed=1
 ob_direction=[0.01*speed,0.01*speed]
 map1_ob_direction=[0*speed,-0.01*speed]
 map2_ob_direction=[0.01*speed,-0.01*speed]
