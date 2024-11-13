@@ -442,7 +442,7 @@ class MainWindow(QMainWindow):
 
         # Set ship size and shape
         self.label_shipsize = QLabel(self.central_widget)
-        self.label_shipsize.setText("Ship size:")
+        self.label_shipsize.setText("Ship size and shape:")
         self.label_shipsize.setStyleSheet("color: #FFFFFF;")
         self.label_shipsize.setFont(font_title)
         self.label_shipsize.adjustSize()
@@ -764,7 +764,7 @@ class MainWindow(QMainWindow):
                 print("Step 3: Please select the ship's dimensions. ")
                 print("Step 4: Please select a start point and end point.")
                 print("Step 5: Once you are done with your selection, press set.")
-                print("Step 6: Press the scroll button to plot local obstacles. ")
+                print("Step 6: Press the left mouse button to plot local obstacles. ")
                 print("Step 7: Press start to run the program.")
                 print("Step 8: Press pause to pause the program.")
                 print("Step 9: Press resume to continue running the program.")
